@@ -57,6 +57,39 @@ To do this we are going to use the following spatial data:
 Please take the time to read the introduction to this dataset
 [here](https://dsl.richmond.edu/panorama/redlining/#loc=3/41.245/-105.469&text=intro)
 
+``` r
+sfzip <-"https://dsl.richmond.edu/panorama/redlining/static/downloads/shapefiles/CASanFrancisco1937.zip"
+
+sfurl <- paste0("/vsizip/vsicurl/",sfzip)
+sf <- read_sf(sfurl)
+sf
+```
+
+    ## # A tibble: 97 × 4
+    ##    name  holc_id holc_grade                                             geometry
+    ##    <chr> <chr>   <chr>                                        <MULTIPOLYGON [°]>
+    ##  1 <NA>  A1      A          (((-122.4755 37.78687, -122.4755 37.78625, -122.476…
+    ##  2 <NA>  A10     A          (((-122.4609 37.73566, -122.461 37.73572, -122.4613…
+    ##  3 <NA>  A11     A          (((-122.4562 37.74046, -122.4566 37.74032, -122.456…
+    ##  4 <NA>  A12     A          (((-122.4715 37.73326, -122.4665 37.73307, -122.465…
+    ##  5 <NA>  A13     A          (((-122.461 37.73572, -122.4609 37.73566, -122.4605…
+    ##  6 <NA>  A2      A          (((-122.4593 37.78795, -122.4598 37.78788, -122.459…
+    ##  7 <NA>  A3      A          (((-122.4472 37.78954, -122.4485 37.78935, -122.454…
+    ##  8 <NA>  A4      A          (((-122.446 37.80388, -122.4458 37.80235, -122.4456…
+    ##  9 <NA>  A5      A          (((-122.4463 37.79187, -122.447 37.7966, -122.4463 …
+    ## 10 <NA>  A6      A          (((-122.4731 37.7346, -122.4724 37.73464, -122.4723…
+    ## # ℹ 87 more rows
+
+``` r
+# tmap_mode("view")
+```
+
+``` r
+tm_shape(sf)+tm_polygons("holc_grade")
+```
+
+![](spatial-assignment_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+
 > “As you explore the materials Mapping Inequality, you will quickly
 > encounter exactly that kind of language, descriptions of
 > the”infiltration” of what were quite often described as “subversive,”

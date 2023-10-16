@@ -52,7 +52,7 @@ sf
 ```
 
 ```{r}
-tmap_mode(sf)
+# tmap_mode("view")
 ```
 
 

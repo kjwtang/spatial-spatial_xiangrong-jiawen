@@ -6,14 +6,19 @@ output:
     df_print: tibble
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(messages = FALSE, cache = FALSE)
+```{r setup}
+#knitr::opts_chunk$set(messages = FALSE, cache = FALSE)
 
 # remotes::install_deps()
 library(tmap)      #interactive maps, raster + vector layers
 library(terra)       # Successor to the raster library
 library(tidyverse)   # our old friend
 library(sf)          # to work with simple features (vector) data
+library(abind)
+library(rstac)
+library(gdalcubes)
+library(stars)
+gdalcubes::gdalcubes_options(parallel = TRUE)
 ```
 
 ## Learning objectives
@@ -52,7 +57,7 @@ sf
 ```
 
 ```{r}
-tmap_mode("view")
+tmap_mode("plot")
 ```
 
 
@@ -60,15 +65,6 @@ tmap_mode("view")
 tm_shape(sf)+tm_polygons("holc_grade")
 ```
 
-
-```{r setup}
-library(tidyverse)
-library(rstac)
-library(gdalcubes)
-library(stars)
-library(tmap)
-gdalcubes::gdalcubes_options(parallel = TRUE)
-```
 
 ```{r}
 ## STAC Search over 400 million assets.
@@ -107,6 +103,7 @@ ndvi <-
   st_as_stars()
 
 ```
+
 ```{r}
 ndvi
 
@@ -126,7 +123,7 @@ tmap_mode("plot")
 ```
 
 ```{r}
-tm_shape(ndvi2) + tm_raster(style = "quantile") + tm_shape(sf) + tm_polygons("holc_grade", alpha = 0.5)
+
 ```
 
 
@@ -134,7 +131,7 @@ tm_shape(ndvi2) + tm_raster(style = "quantile") + tm_shape(sf) + tm_polygons("ho
 **Create a map which shows current (2019) mean NDVI across city redlining from the 1950s.**
 
 ```{r}
-
+tm_shape(ndvi2) + tm_raster(style = "quantile") + tm_shape(sf) + tm_polygons("holc_grade", alpha = 0.5)
 ```
 
 # Exercise 2

@@ -122,11 +122,11 @@ NDVI is used as proxy measure of vegetation health, cover and phenology (life cy
 
 ```{r}
 ndvi2<-ndvi |>st_as_stars()
-tmap_mode("view")
+tmap_mode("plot")
 ```
 
 ```{r}
-tm_shape(ndvi2) + tm_raster()
+tm_shape(ndvi2) + tm_raster(style = "quantile") + tm_shape(sf) + tm_polygons("holc_grade", alpha = 0.5)
 ```
 
 # Exercise 1

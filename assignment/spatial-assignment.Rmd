@@ -129,10 +129,12 @@ tmap_mode("plot")
 tm_shape(ndvi2) + tm_raster(style = "quantile") + tm_shape(sf) + tm_polygons("holc_grade", alpha = 0.5)
 ```
 
+
 # Exercise 1
 **Create a map which shows current (2019) mean NDVI across city redlining from the 1950s.**
 
 ```{r}
+
 ```
 
 # Exercise 2

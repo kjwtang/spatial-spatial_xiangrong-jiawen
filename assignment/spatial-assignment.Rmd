@@ -52,7 +52,7 @@ sf
 ```
 
 ```{r}
-tmap_mode(sf)
+tmap_mode("view")
 ```
 
 
@@ -61,13 +61,73 @@ tm_shape(sf)+tm_polygons("holc_grade")
 ```
 
 
+```{r setup}
+library(tidyverse)
+library(rstac)
+library(gdalcubes)
+library(stars)
+library(tmap)
+gdalcubes::gdalcubes_options(parallel = TRUE)
+```
+
+```{r}
+## STAC Search over 400 million assets.
+box <- c(xmin=-122.51006, ymin=37.70801, xmax=-122.36268, ymax=37.80668) 
+start_date <- "2022-06-01"
+end_date <- "2022-08-01"
+items <- 
+  stac("https://earth-search.aws.element84.com/v0/") |>
+  stac_search(collections = "sentinel-s2-l2a-cogs",
+              bbox = box,
+              datetime = paste(start_date, end_date, sep="/"),
+              limit = 100) |>
+  post_request() 
+```
+
+```{r}
+col <-
+  stac_image_collection(items$features,
+                        asset_names = c("B02", "B03", "B04","B08", "SCL"),
+                        property_filter = \(x) {x[["eo:cloud_cover"]] < 20})
+cube <- cube_view(srs = "EPSG:4326",  
+                  extent = list(t0 = start_date, t1 = "2022-08-31",
+                                left = box[1], right = box[3],
+                                top = box[4], bottom = box[2]),
+                  nx = 1000, ny = 1000, dt = "P1M",
+                  aggregation = "median", resampling = "average")
+```
+```{r}
+S2.mask <- image_mask("SCL", values=c(3,8,9)) # mask clouds and cloud shadows
+
+ndvi <- 
+  raster_cube(col, cube, mask = S2.mask) |>
+  select_bands(c("B08", "B04")) |>
+  apply_pixel("(B08-B04)/(B08+B04)", "NDVI") |>
+  aggregate_time("P3M") |>
+  st_as_stars()
+
+```
+```{r}
+ndvi
+
+```
+
+
+
 
 > "As you explore the materials Mapping Inequality, you will quickly encounter exactly that kind of language, descriptions of the "infiltration" of what were quite often described as "subversive," "undesirable," "inharmonious," or "lower grade" populations, for they are everywhere in the HOLC archive ....These grades were a tool for redlining: making it difficult or impossible for people in certain areas to access mortgage financing and thus become homeowners. Redlining directed both public and private capital to native-born white families and away from African American and immigrant families. As homeownership was arguably the most significant means of intergenerational wealth building in the United States in the twentieth century, these redlining practices from eight decades ago had long-term effects in creating wealth inequalities that we still see today. Mapping Inequality, we hope, will allow and encourage you to grapple with this history of government policies contributing to inequality."
 
 **2.Normalized Difference Vegetation Index (NDVI)** (raster data)
 NDVI is used as proxy measure of vegetation health, cover and phenology (life cycle stage) over large areas. It is calculated using multiple bands from satellite images.
 
+```{r}
+ndvi2<-ndvi |>st_as_stars()
+tmap_mode("view")
+```
 
+```{r}
+tm_shape(ndvi2) + tm_raster()
+```
 
 # Exercise 1
 **Create a map which shows current (2019) mean NDVI across city redlining from the 1950s.**

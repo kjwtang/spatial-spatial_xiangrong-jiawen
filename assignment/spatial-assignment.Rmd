@@ -99,15 +99,14 @@ ndvi <-
   raster_cube(col, cube, mask = S2.mask) |>
   select_bands(c("B08", "B04")) |>
   apply_pixel("(B08-B04)/(B08+B04)", "NDVI") |>
-  aggregate_time("P3M") |>
-  st_as_stars()
+  aggregate_time("P3M") 
+
  
-  
-ave_ndvi <- 
-  raster_cube(col, cube, mask = S2.mask) |>
-  select_bands(c("B08", "B04")) |>
-  apply_pixel("(B08-B04)/(B08+B04)", "NDVI") |>
-  aggregate_time("P3M") |>
+ndvi_2 <- ndvi|>
+  st_as_stars() 
+
+
+ave_ndvi <- ndvi |>
   extract_geom(sf,FUN = mean)
     
 
@@ -139,6 +138,13 @@ tm_shape(ndvi2) + tm_raster(style = "quantile") + tm_shape(sf) + tm_polygons("ho
 # Exercise 2
 **Plot the average NDVI values in different neighborhoods as well as the distribution of pixel values across cities and neighborhoods. Show how the trends differ between cities.**
 
+```{r}
+ndvi3<-ave_ndvi |>st_as_stars()
+tmap_mode("plot")
+```
+```{r}
+tm_shape(ndvi3) + tm_raster()
+```
 
 
 

@@ -9,13 +9,6 @@ Millie Chapman (GSI)
 library(tmap)      #interactive maps, raster + vector layers
 ```
 
-    ## The legacy packages maptools, rgdal, and rgeos, underpinning the sp package,
-    ## which was just loaded, were retired in October 2023.
-    ## Please refer to R-spatial evolution reports for details, especially
-    ## https://r-spatial.org/r/2023/05/15/evolution4.html.
-    ## It may be desirable to make the sf package available;
-    ## package maintainers should consider adding sf to Suggests:.
-
     ## Breaking News: tmap 3.x is retiring. Please test v4, e.g. with
     ## remotes::install_github('r-tmap/tmap')
 

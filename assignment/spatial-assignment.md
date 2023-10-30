@@ -421,10 +421,11 @@ ndvi_poly <- left_join(sf2 , ave_ndvi)
 
 ``` r
 ndvi_poly <- filter(ndvi_poly, NDVI > -1)
+ndvi_poly <- filter(ndvi_poly, NDVI < 1)
 ndvi_poly
 ```
 
-    ## # A tibble: 96 × 7
+    ## # A tibble: 95 × 7
     ##      FID name  holc_id holc_grade                           geometry time   NDVI
     ##    <int> <chr> <chr>   <chr>                      <MULTIPOLYGON [°]> <chr> <dbl>
     ##  1     1 <NA>  A1      A          (((-122.4755 37.78687, -122.4755 … 2022… 0.310
@@ -437,7 +438,7 @@ ndvi_poly
     ##  8     8 <NA>  A4      A          (((-122.446 37.80388, -122.4458 3… 2022… 0.238
     ##  9     9 <NA>  A5      A          (((-122.4463 37.79187, -122.447 3… 2022… 0.308
     ## 10    10 <NA>  A6      A          (((-122.4731 37.7346, -122.4724 3… 2022… 0.282
-    ## # ℹ 86 more rows
+    ## # ℹ 85 more rows
 
 ``` r
 tmap_mode("plot")
@@ -451,8 +452,6 @@ tm_shape(ndvi_poly) + tm_polygons("NDVI", palette = "Greens") +
   tm_shape(ndvi_poly) + tm_text("holc_grade", size = 0.5)
 ```
 
-    ## Legend labels were too wide. The labels have been resized to 0.05, 0.02, 0.02, 0.02. Increase legend.width (argument of tm_layout) to make the legend wider and therefore the labels larger.
-
 ![](spatial-assignment_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 ``` r
@@ -464,10 +463,10 @@ ndvi_poly |> as_tibble() |>
     ## # A tibble: 4 × 2
     ##   holc_grade mean_NDVI
     ##   <chr>          <dbl>
-    ## 1 A          3.16e-  1
-    ## 2 B          2.11e-  1
-    ## 3 C          5.92e+266
-    ## 4 D          1.82e-  1
+    ## 1 A              0.316
+    ## 2 B              0.211
+    ## 3 C              0.193
+    ## 4 D              0.182
 
 # Exercise 3:
 

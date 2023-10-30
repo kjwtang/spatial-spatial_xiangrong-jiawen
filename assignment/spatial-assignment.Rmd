@@ -6,6 +6,7 @@ output:
     df_print: tibble
 ---
 
+
 ```{r setup}
 knitr::opts_chunk$set(messages = FALSE, cache = FALSE)
 
@@ -19,7 +20,13 @@ library(rstac)
 library(gdalcubes)
 library(stars)
 library(jsonlite)
+library(dplyr)
 gdalcubes::gdalcubes_options(parallel = TRUE)
+```
+
+```{r}
+#renv::activate()
+#renv::snapshot()
 ```
 
 ## Learning objectives
@@ -95,28 +102,36 @@ cube <- cube_view(srs = "EPSG:4326",
 ```
 ```{r}
 S2.mask <- image_mask("SCL", values=c(3,8,9)) # mask clouds and cloud shadows
+raster_cube(col, cube, mask = S2.mask) |>
+  select_bands(c("B04", "B03", "B02")) |>
+  plot(rgb = 1:3)
+```
 
+```{r}
 ndvi <- 
   raster_cube(col, cube, mask = S2.mask) |>
   select_bands(c("B08", "B04")) |>
   apply_pixel("(B08-B04)/(B08+B04)", "NDVI") |>
-  aggregate_time("P3M") 
-
- 
-ndvi_2 <- ndvi|>
-  st_as_stars() 
-
-
-ave_ndvi <- ndvi |>
-  extract_geom(sf,FUN = mean)
-    
-
+  aggregate_time("P3M") |>
+  st_as_stars()
 ```
 
 ```{r}
+ave_ndvi <-
+  raster_cube(col, cube, mask = S2.mask) |>
+  select_bands(c("B08", "B04")) |>
+  apply_pixel("(B08-B04)/(B08+B04)", "NDVI") |>
+  aggregate_time("P3M") |>
+  extract_geom(sf, FUN = mean )
 ndvi
-
+ave_ndvi
 ```
+
+```{r}
+#ave_ndvi <- ndvi |>
+  #extract_geom(sf,FUN = mean)
+```
+
 
 > "As you explore the materials Mapping Inequality, you will quickly encounter exactly that kind of language, descriptions of the "infiltration" of what were quite often described as "subversive," "undesirable," "inharmonious," or "lower grade" populations, for they are everywhere in the HOLC archive ....These grades were a tool for redlining: making it difficult or impossible for people in certain areas to access mortgage financing and thus become homeowners. Redlining directed both public and private capital to native-born white families and away from African American and immigrant families. As homeownership was arguably the most significant means of intergenerational wealth building in the United States in the twentieth century, these redlining practices from eight decades ago had long-term effects in creating wealth inequalities that we still see today. Mapping Inequality, we hope, will allow and encourage you to grapple with this history of government policies contributing to inequality."
 
@@ -124,7 +139,7 @@ ndvi
 NDVI is used as proxy measure of vegetation health, cover and phenology (life cycle stage) over large areas. It is calculated using multiple bands from satellite images.
 
 ```{r}
-ndvi2<-ndvi |>st_as_stars()
+ndvi2 <- ndvi |>st_as_stars()
 tmap_mode("plot")
 ```
 
@@ -140,12 +155,25 @@ tm_shape(ndvi2) + tm_raster(style = "quantile") + tm_shape(sf) + tm_polygons("ho
 **Plot the average NDVI values in different neighborhoods as well as the distribution of pixel values across cities and neighborhoods. Show how the trends differ between cities.**
 
 ```{r}
-ndvi3<- ave_ndvi |>st_as_stars()
-tmap_mode("plot")
+ave_ndvi |> as_tibble()
+sf2 <- sf |> rowid_to_column("FID")
+sf2
+ndvi_poly <- left_join(sf2 , ave_ndvi)
+ndvi_poly <- filter(ndvi_poly, NDVI > -1)
+ndvi_poly <- filter(ndvi_poly, NDVI < 1)
+ndvi_poly
 ```
 
 ```{r}
-tm_shape(ndvi3) + tm_raster()
+tmap_mode("plot")
+tm_basemap() + 
+tm_shape(ndvi_poly) + tm_polygons("NDVI", palette = "Greens") + 
+  tm_shape(ndvi_poly) + tm_text("holc_grade", size = 0.5)
+```
+```{r}
+ndvi_poly |> as_tibble() |>
+  group_by(holc_grade) |>
+  summarise(mean_NDVI = mean(NDVI))
 ```
 
 

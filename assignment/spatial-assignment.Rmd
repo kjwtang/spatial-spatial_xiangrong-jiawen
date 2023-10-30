@@ -18,6 +18,7 @@ library(abind)
 library(rstac)
 library(gdalcubes)
 library(stars)
+library(jsonlite)
 gdalcubes::gdalcubes_options(parallel = TRUE)
 ```
 

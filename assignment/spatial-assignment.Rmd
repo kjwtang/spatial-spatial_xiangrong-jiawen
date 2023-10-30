@@ -7,7 +7,7 @@ output:
 ---
 
 ```{r setup}
-#knitr::opts_chunk$set(messages = FALSE, cache = FALSE)
+knitr::opts_chunk$set(messages = FALSE, cache = FALSE)
 
 # remotes::install_deps()
 library(tmap)      #interactive maps, raster + vector layers
@@ -139,9 +139,10 @@ tm_shape(ndvi2) + tm_raster(style = "quantile") + tm_shape(sf) + tm_polygons("ho
 **Plot the average NDVI values in different neighborhoods as well as the distribution of pixel values across cities and neighborhoods. Show how the trends differ between cities.**
 
 ```{r}
-ndvi3<-ave_ndvi |>st_as_stars()
+ndvi3<- ave_ndvi |>st_as_stars()
 tmap_mode("plot")
 ```
+
 ```{r}
 tm_shape(ndvi3) + tm_raster()
 ```

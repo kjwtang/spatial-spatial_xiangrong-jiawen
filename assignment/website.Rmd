@@ -4,8 +4,6 @@ author: "Millie Chapman (GSI)"
 output: 
   html_document:
     df_print: paged
-  github_document:
-    df_print: tibble
 ---
 
 
@@ -67,7 +65,7 @@ sf
 ```
 
 ```{r}
-tmap_mode("plot")
+tmap_mode("view")
 ```
 
 
@@ -142,7 +140,7 @@ NDVI is used as proxy measure of vegetation health, cover and phenology (life cy
 
 ```{r}
 ndvi2 <- ndvi |>st_as_stars()
-tmap_mode("plot")
+tmap_mode("view")
 ```
 
 
@@ -167,7 +165,7 @@ ndvi_poly
 ```
 
 ```{r}
-tmap_mode("plot")
+tmap_mode("view")
 tm_basemap() + 
 tm_shape(ndvi_poly) + tm_polygons("NDVI", palette = "Greens") + 
   tm_shape(ndvi_poly) + tm_text("holc_grade", size = 0.5)

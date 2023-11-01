@@ -8,7 +8,7 @@ output:
 
 
 ```{r setup}
-knitr::opts_chunk$set(messages = FALSE, cache = FALSE)
+knitr::opts_chunk$set(messages = FALSE, cache = FALSE, echo = FALSE)
 
 # remotes::install_deps()
 library(tmap)      #interactive maps, raster + vector layers

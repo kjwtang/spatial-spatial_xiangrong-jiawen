@@ -7,7 +7,7 @@ output:
 ---
 
 
-```{r setup}
+```{r setup, messages = FALSE, cache = FALSE, warning = FALSE}
 knitr::opts_chunk$set(messages = FALSE, cache = FALSE, warning = FALSE)
 
 # remotes::install_deps()
@@ -17,7 +17,7 @@ library(tidyverse)   # our old friend
 library(sf)          # to work with simple features (vector) data
 library(abind)
 library(rstac)
-library(gdalcubes)
+library(gdalcubes, verbose = FALSE)
 library(stars)
 library(jsonlite)
 library(dplyr)

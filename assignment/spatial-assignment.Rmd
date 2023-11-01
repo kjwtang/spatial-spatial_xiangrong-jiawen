@@ -8,7 +8,7 @@ output:
 
 
 ```{r setup}
-knitr::opts_chunk$set(messages = FALSE, cache = FALSE)
+knitr::opts_chunk$set(messages = FALSE, cache = FALSE, warning = FALSE)
 
 # remotes::install_deps()
 library(tmap)      #interactive maps, raster + vector layers
@@ -100,6 +100,7 @@ cube <- cube_view(srs = "EPSG:4326",
                   nx = 1000, ny = 1000, dt = "P1M",
                   aggregation = "median", resampling = "average")
 ```
+
 ```{r}
 S2.mask <- image_mask("SCL", values=c(3,8,9)) # mask clouds and cloud shadows
 raster_cube(col, cube, mask = S2.mask) |>

@@ -3,71 +3,11 @@ The ecological and evolutionary consequences of systemic racism
 Millie Chapman (GSI)
 
 ``` r
-knitr::opts_chunk$set(messages = FALSE, cache = FALSE)
+knitr::opts_chunk$set(messages = FALSE, cache = FALSE, echo = FALSE, warning = FALSE)
 
 # remotes::install_deps()
 library(tmap)      #interactive maps, raster + vector layers
 ```
-
-    ## code for methods in class "Rcpp_SpatCategories" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
-    ## code for methods in class "Rcpp_SpatCategories" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
-
-    ## code for methods in class "Rcpp_SpatDataFrame" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
-    ## code for methods in class "Rcpp_SpatDataFrame" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
-
-    ## code for methods in class "Rcpp_SpatExtent" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
-    ## code for methods in class "Rcpp_SpatExtent" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
-
-    ## code for methods in class "Rcpp_SpatFactor" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
-    ## code for methods in class "Rcpp_SpatFactor" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
-
-    ## code for methods in class "Rcpp_SpatGraph" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
-    ## code for methods in class "Rcpp_SpatGraph" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
-
-    ## code for methods in class "Rcpp_SpatMessages" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
-    ## code for methods in class "Rcpp_SpatMessages" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
-
-    ## code for methods in class "Rcpp_SpatOptions" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
-    ## code for methods in class "Rcpp_SpatOptions" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
-
-    ## code for methods in class "Rcpp_SpatRaster" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
-    ## code for methods in class "Rcpp_SpatRaster" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
-
-    ## code for methods in class "Rcpp_SpatRasterCollection" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
-    ## code for methods in class "Rcpp_SpatRasterCollection" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
-
-    ## code for methods in class "Rcpp_SpatRasterStack" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
-    ## code for methods in class "Rcpp_SpatRasterStack" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
-
-    ## code for methods in class "Rcpp_SpatSRS" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
-    ## code for methods in class "Rcpp_SpatSRS" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
-
-    ## code for methods in class "Rcpp_SpatTime_v" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
-    ## code for methods in class "Rcpp_SpatTime_v" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
-
-    ## code for methods in class "Rcpp_SpatVector" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
-    ## code for methods in class "Rcpp_SpatVector" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
-
-    ## code for methods in class "Rcpp_SpatVector2" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
-    ## code for methods in class "Rcpp_SpatVector2" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
-
-    ## code for methods in class "Rcpp_SpatVectorCollection" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
-    ## code for methods in class "Rcpp_SpatVectorCollection" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
-
-    ## code for methods in class "Rcpp_SpatVectorProxy" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
-    ## code for methods in class "Rcpp_SpatVectorProxy" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
-
-    ## code for methods in class "Rcpp_SpExtent" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
-    ## code for methods in class "Rcpp_SpExtent" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
-
-    ## code for methods in class "Rcpp_SpPoly" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
-    ## code for methods in class "Rcpp_SpPoly" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
-
-    ## code for methods in class "Rcpp_SpPolyPart" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
-    ## code for methods in class "Rcpp_SpPolyPart" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
-
-    ## code for methods in class "Rcpp_SpPolygons" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
-    ## code for methods in class "Rcpp_SpPolygons" was not checked for suspicious field assignments (recommended package 'codetools' not available?)
 
     ## Breaking News: tmap 3.x is retiring. Please test v4, e.g. with
     ## remotes::install_github('r-tmap/tmap')
@@ -131,11 +71,6 @@ library(dplyr)
 gdalcubes::gdalcubes_options(parallel = TRUE)
 ```
 
-``` r
-#renv::activate()
-#renv::snapshot()
-```
-
 ## Learning objectives
 
 This module provides an introduction to the fundamentals of working with
@@ -191,14 +126,6 @@ To do this we are going to use the following spatial data:
 Please take the time to read the introduction to this dataset
 [here](https://dsl.richmond.edu/panorama/redlining/#loc=3/41.245/-105.469&text=intro)
 
-``` r
-sfzip <-"https://dsl.richmond.edu/panorama/redlining/static/downloads/shapefiles/CASanFrancisco1937.zip"
-
-sfurl <- paste0("/vsizip/vsicurl/",sfzip)
-sf <- read_sf(sfurl)
-sf
-```
-
     ## # A tibble: 97 × 4
     ##    name  holc_id holc_grade                                             geometry
     ##    <chr> <chr>   <chr>                                        <MULTIPOLYGON [°]>
@@ -214,79 +141,11 @@ sf
     ## 10 <NA>  A6      A          (((-122.4731 37.7346, -122.4724 37.73464, -122.4723…
     ## # ℹ 87 more rows
 
-``` r
-tmap_mode("plot")
-```
-
     ## tmap mode set to plotting
-
-``` r
-tm_shape(sf)+tm_polygons("holc_grade")
-```
 
 ![](spatial-assignment_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
-``` r
-## STAC Search over 400 million assets.
-box <- c(xmin=-122.51006, ymin=37.70801, xmax=-122.36268, ymax=37.80668) 
-start_date <- "2022-06-01"
-end_date <- "2022-08-01"
-items <- 
-  stac("https://earth-search.aws.element84.com/v0/") |>
-  stac_search(collections = "sentinel-s2-l2a-cogs",
-              bbox = box,
-              datetime = paste(start_date, end_date, sep="/"),
-              limit = 100) |>
-  post_request() 
-```
-
-``` r
-col <-
-  stac_image_collection(items$features,
-                        asset_names = c("B02", "B03", "B04","B08", "SCL"),
-                        property_filter = \(x) {x[["eo:cloud_cover"]] < 20})
-```
-
-    ## Warning in stac_image_collection(items$features, asset_names = c("B02", : STAC
-    ## asset with name 'SCL' does not include eo:bands metadata and will be considered
-    ## as a single band source
-
-``` r
-cube <- cube_view(srs = "EPSG:4326",  
-                  extent = list(t0 = start_date, t1 = "2022-08-31",
-                                left = box[1], right = box[3],
-                                top = box[4], bottom = box[2]),
-                  nx = 1000, ny = 1000, dt = "P1M",
-                  aggregation = "median", resampling = "average")
-```
-
-``` r
-S2.mask <- image_mask("SCL", values=c(3,8,9)) # mask clouds and cloud shadows
-raster_cube(col, cube, mask = S2.mask) |>
-  select_bands(c("B04", "B03", "B02")) |>
-  plot(rgb = 1:3)
-```
-
 ![](spatial-assignment_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
-
-``` r
-ndvi <- 
-  raster_cube(col, cube, mask = S2.mask) |>
-  select_bands(c("B08", "B04")) |>
-  apply_pixel("(B08-B04)/(B08+B04)", "NDVI") |>
-  aggregate_time("P3M") |>
-  st_as_stars()
-```
-
-``` r
-ave_ndvi <-
-  raster_cube(col, cube, mask = S2.mask) |>
-  select_bands(c("B08", "B04")) |>
-  apply_pixel("(B08-B04)/(B08+B04)", "NDVI") |>
-  aggregate_time("P3M") |>
-  extract_geom(sf, FUN = mean )
-ndvi
-```
 
     ## stars object with 3 dimensions and 1 attribute
     ## attribute(s), summary of first 1e+05 cells:
@@ -297,10 +156,6 @@ ndvi
     ## x       1 1001 -122.5  0.0001474  WGS 84    NA                    NULL [x]
     ## y       1 1000  37.81 -9.867e-05  WGS 84    NA                    NULL [y]
     ## time    1    1     NA         NA POSIXct FALSE [2022-06-01,2022-09-01)
-
-``` r
-ave_ndvi
-```
 
     ## # A tibble: 97 × 3
     ##      FID time        NDVI
@@ -316,11 +171,6 @@ ave_ndvi
     ##  9     9 2022-06-01 0.308
     ## 10    10 2022-06-01 0.282
     ## # ℹ 87 more rows
-
-``` r
-#ave_ndvi <- ndvi |>
-  #extract_geom(sf,FUN = mean)
-```
 
 > “As you explore the materials Mapping Inequality, you will quickly
 > encounter exactly that kind of language, descriptions of
@@ -344,10 +194,15 @@ is used as proxy measure of vegetation health, cover and phenology (life
 cycle stage) over large areas. It is calculated using multiple bands
 from satellite images.
 
-``` r
-ndvi2 <- ndvi |>st_as_stars()
-tmap_mode("plot")
-```
+    ## stars object with 3 dimensions and 1 attribute
+    ## attribute(s), summary of first 1e+05 cells:
+    ##             Min.    1st Qu.     Median       Mean   3rd Qu.      Max.
+    ## NDVI  -0.6376002 -0.1380293 0.02614136 0.05817926 0.2067806 0.9047929
+    ## dimension(s):
+    ##      from   to offset      delta  refsys point                  values x/y
+    ## x       1 1001 -122.5  0.0001474  WGS 84    NA                    NULL [x]
+    ## y       1 1000  37.81 -9.867e-05  WGS 84    NA                    NULL [y]
+    ## time    1    1     NA         NA POSIXct FALSE [2022-06-01,2022-09-01)
 
     ## tmap mode set to plotting
 
@@ -356,15 +211,9 @@ tmap_mode("plot")
 **Create a map which shows current (2019) mean NDVI across city
 redlining from the 1950s.**
 
-``` r
-tm_shape(ndvi2) + tm_raster(style = "quantile") + tm_shape(sf) + tm_polygons("holc_grade", alpha = 0.5)
-```
-
     ## stars object downsampled to 1000 by 999 cells. See tm_shape manual (argument raster.downsample)
 
     ## Variable(s) "NA" contains positive and negative values, so midpoint is set to 0. Set midpoint = NA to show the full spectrum of the color palette.
-
-    ## Some legend labels were too wide. These labels have been resized to 0.05, 0.05. Increase legend.width (argument of tm_layout) to make the legend wider and therefore the labels larger.
 
 ![](spatial-assignment_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
 
@@ -373,10 +222,6 @@ tm_shape(ndvi2) + tm_raster(style = "quantile") + tm_shape(sf) + tm_polygons("ho
 **Plot the average NDVI values in different neighborhoods as well as the
 distribution of pixel values across cities and neighborhoods. Show how
 the trends differ between cities.**
-
-``` r
-ave_ndvi |> as_tibble()
-```
 
     ## # A tibble: 97 × 3
     ##      FID time        NDVI
@@ -393,11 +238,6 @@ ave_ndvi |> as_tibble()
     ## 10    10 2022-06-01 0.282
     ## # ℹ 87 more rows
 
-``` r
-sf2 <- sf |> rowid_to_column("FID")
-sf2
-```
-
     ## # A tibble: 97 × 5
     ##      FID name  holc_id holc_grade                                       geometry
     ##    <int> <chr> <chr>   <chr>                                  <MULTIPOLYGON [°]>
@@ -413,17 +253,7 @@ sf2
     ## 10    10 <NA>  A6      A          (((-122.4731 37.7346, -122.4724 37.73464, -12…
     ## # ℹ 87 more rows
 
-``` r
-ndvi_poly <- left_join(sf2 , ave_ndvi)
-```
-
     ## Joining with `by = join_by(FID)`
-
-``` r
-ndvi_poly <- filter(ndvi_poly, NDVI > -1)
-ndvi_poly <- filter(ndvi_poly, NDVI < 1)
-ndvi_poly
-```
 
     ## # A tibble: 95 × 7
     ##      FID name  holc_id holc_grade                           geometry time   NDVI
@@ -440,25 +270,9 @@ ndvi_poly
     ## 10    10 <NA>  A6      A          (((-122.4731 37.7346, -122.4724 3… 2022… 0.282
     ## # ℹ 85 more rows
 
-``` r
-tmap_mode("plot")
-```
-
     ## tmap mode set to plotting
 
-``` r
-tm_basemap() + 
-tm_shape(ndvi_poly) + tm_polygons("NDVI", palette = "Greens") + 
-  tm_shape(ndvi_poly) + tm_text("holc_grade", size = 0.5)
-```
-
 ![](spatial-assignment_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
-
-``` r
-ndvi_poly |> as_tibble() |>
-  group_by(holc_grade) |>
-  summarise(mean_NDVI = mean(NDVI))
-```
 
     ## # A tibble: 4 × 2
     ##   holc_grade mean_NDVI

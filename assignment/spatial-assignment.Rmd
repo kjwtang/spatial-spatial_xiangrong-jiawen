@@ -140,6 +140,9 @@ NDVI is used as proxy measure of vegetation health, cover and phenology (life cy
 
 ```{r}
 ndvi2 <- ndvi |>st_as_stars()
+ndvi2[ndvi2 > 1] <- NA
+ndvi2[ndvi2 < -1] <- NA
+ndvi2
 tmap_mode("plot")
 ```
 

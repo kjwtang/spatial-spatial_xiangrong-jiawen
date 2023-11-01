@@ -140,6 +140,9 @@ NDVI is used as proxy measure of vegetation health, cover and phenology (life cy
 
 ```{r}
 ndvi2 <- ndvi |>st_as_stars()
+ndvi2[ndvi2 > 1] <- NA
+ndvi2[ndvi2 < -1] <- NA
+ndvi2
 tmap_mode("view")
 ```
 
@@ -148,7 +151,7 @@ tmap_mode("view")
 **Create a map which shows current (2019) mean NDVI across city redlining from the 1950s.**
 
 ```{r}
-tm_shape(ndvi2) + tm_raster(style = "quantile") + tm_shape(sf) + tm_polygons("holc_grade", alpha = 0.5)
+tm_shape(ndvi2) + tm_raster(style = "quantile", legend.show = FALSE) + tm_shape(sf) + tm_polygons("holc_grade", alpha = 0.5)
 ```
 
 # Exercise 2

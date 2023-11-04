@@ -1,16 +1,24 @@
 ---
 title: "The ecological and evolutionary consequences of systemic racism"
-author: "Millie Chapman (GSI)"
+author: "Millie Chapman (GSI), Jiawen Tang, Mark Sun"
 output: 
   github_document:
     df_print: tibble
 ---
 
-
 ```{r setup, messages = FALSE, cache = FALSE, warning = FALSE}
 knitr::opts_chunk$set(messages = FALSE, cache = FALSE, warning = FALSE)
 
-# remotes::install_deps()
+# Install and load required packages
+packages_to_install <- c("tmap", "terra", "tidyverse", "sf", "abind", "rstac", "gdalcubes", "stars", "jsonlite", "dplyr")
+
+# Check if the packages are installed, and if not, install them
+for (package in packages_to_install) {
+  if (!requireNamespace(package, quietly = TRUE)) {
+    install.packages(package)
+  }
+}
+
 library(tmap)      #interactive maps, raster + vector layers
 library(terra)       # Successor to the raster library
 library(tidyverse)   # our old friend
@@ -24,10 +32,6 @@ library(dplyr)
 gdalcubes::gdalcubes_options(parallel = TRUE)
 ```
 
-```{r}
-#renv::activate()
-#renv::snapshot()
-```
 
 ## Learning objectives
 This module provides an introduction to the fundamentals of working with spatial vector and raster data in R while empirically exploring why systematic and structural racism is interwined with urban ecological processes. This module uses the Simple Features Access standard (ISO 19125) and tidyverse-style workflow using the sf package and emerging ecosystem of r-spatial tools.
@@ -66,17 +70,14 @@ sf
 
 ```{r}
 tmap_mode("plot")
-```
-
-
-```{r}
 tm_shape(sf)+tm_polygons("holc_grade")
 ```
 
 
+
 ```{r}
 ## STAC Search over 400 million assets.
-box <- c(xmin=-122.51006, ymin=37.70801, xmax=-122.36268, ymax=37.80668) 
+box <- c(xmin=-122.51020, ymin=37.65801, xmax=-122.30000, ymax=37.85668) 
 start_date <- "2022-06-01"
 end_date <- "2022-08-01"
 items <- 
@@ -115,9 +116,6 @@ ndvi <-
   apply_pixel("(B08-B04)/(B08+B04)", "NDVI") |>
   aggregate_time("P3M") |>
   st_as_stars()
-```
-
-```{r}
 ave_ndvi <-
   raster_cube(col, cube, mask = S2.mask) |>
   select_bands(c("B08", "B04")) |>
@@ -128,10 +126,6 @@ ndvi
 ave_ndvi
 ```
 
-```{r}
-#ave_ndvi <- ndvi |>
-  #extract_geom(sf,FUN = mean)
-```
 
 
 > "As you explore the materials Mapping Inequality, you will quickly encounter exactly that kind of language, descriptions of the "infiltration" of what were quite often described as "subversive," "undesirable," "inharmonious," or "lower grade" populations, for they are everywhere in the HOLC archive ....These grades were a tool for redlining: making it difficult or impossible for people in certain areas to access mortgage financing and thus become homeowners. Redlining directed both public and private capital to native-born white families and away from African American and immigrant families. As homeownership was arguably the most significant means of intergenerational wealth building in the United States in the twentieth century, these redlining practices from eight decades ago had long-term effects in creating wealth inequalities that we still see today. Mapping Inequality, we hope, will allow and encourage you to grapple with this history of government policies contributing to inequality."

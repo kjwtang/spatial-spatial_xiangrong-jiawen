@@ -1,11 +1,20 @@
 The ecological and evolutionary consequences of systemic racism
 ================
-Millie Chapman (GSI)
+Millie Chapman (GSI), Jiawen Tang, Mark Sun
 
 ``` r
-knitr::opts_chunk$set(messages = FALSE, cache = FALSE, echo = FALSE, warning = FALSE)
+knitr::opts_chunk$set(messages = FALSE, cache = FALSE, warning = FALSE)
 
-# remotes::install_deps()
+# Install and load required packages
+packages_to_install <- c("tmap", "terra", "tidyverse", "sf", "abind", "rstac", "gdalcubes", "stars", "jsonlite", "dplyr")
+
+# Check if the packages are installed, and if not, install them
+for (package in packages_to_install) {
+  if (!requireNamespace(package, quietly = TRUE)) {
+    install.packages(package)
+  }
+}
+
 library(tmap)      #interactive maps, raster + vector layers
 ```
 
@@ -44,7 +53,7 @@ library(sf)          # to work with simple features (vector) data
 ``` r
 library(abind)
 library(rstac)
-library(gdalcubes)
+library(gdalcubes, verbose = FALSE)
 ```
 
     ## 
@@ -126,6 +135,14 @@ To do this we are going to use the following spatial data:
 Please take the time to read the introduction to this dataset
 [here](https://dsl.richmond.edu/panorama/redlining/#loc=3/41.245/-105.469&text=intro)
 
+``` r
+sfzip <-"https://dsl.richmond.edu/panorama/redlining/static/downloads/shapefiles/CASanFrancisco1937.zip"
+
+sfurl <- paste0("/vsizip/vsicurl/",sfzip)
+sf <- read_sf(sfurl)
+sf
+```
+
     ## # A tibble: 97 × 4
     ##    name  holc_id holc_grade                                             geometry
     ##    <chr> <chr>   <chr>                                        <MULTIPOLYGON [°]>
@@ -141,34 +158,96 @@ Please take the time to read the introduction to this dataset
     ## 10 <NA>  A6      A          (((-122.4731 37.7346, -122.4724 37.73464, -122.4723…
     ## # ℹ 87 more rows
 
+``` r
+tmap_mode("plot")
+```
+
     ## tmap mode set to plotting
 
-![](spatial-assignment_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+``` r
+tm_shape(sf)+tm_polygons("holc_grade")
+```
 
-![](spatial-assignment_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](spatial-assignment_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+
+``` r
+## STAC Search over 400 million assets.
+box <- c(xmin=-122.51020, ymin=37.65801, xmax=-122.30000, ymax=37.85668) 
+start_date <- "2022-06-01"
+end_date <- "2022-08-01"
+items <- 
+  stac("https://earth-search.aws.element84.com/v0/") |>
+  stac_search(collections = "sentinel-s2-l2a-cogs",
+              bbox = box,
+              datetime = paste(start_date, end_date, sep="/"),
+              limit = 100) |>
+  post_request() 
+```
+
+``` r
+col <-
+  stac_image_collection(items$features,
+                        asset_names = c("B02", "B03", "B04","B08", "SCL"),
+                        property_filter = \(x) {x[["eo:cloud_cover"]] < 20})
+cube <- cube_view(srs = "EPSG:4326",  
+                  extent = list(t0 = start_date, t1 = "2022-08-31",
+                                left = box[1], right = box[3],
+                                top = box[4], bottom = box[2]),
+                  nx = 1000, ny = 1000, dt = "P1M",
+                  aggregation = "median", resampling = "average")
+```
+
+``` r
+S2.mask <- image_mask("SCL", values=c(3,8,9)) # mask clouds and cloud shadows
+raster_cube(col, cube, mask = S2.mask) |>
+  select_bands(c("B04", "B03", "B02")) |>
+  plot(rgb = 1:3)
+```
+
+![](spatial-assignment_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+
+``` r
+ndvi <- 
+  raster_cube(col, cube, mask = S2.mask) |>
+  select_bands(c("B08", "B04")) |>
+  apply_pixel("(B08-B04)/(B08+B04)", "NDVI") |>
+  aggregate_time("P3M") |>
+  st_as_stars()
+ave_ndvi <-
+  raster_cube(col, cube, mask = S2.mask) |>
+  select_bands(c("B08", "B04")) |>
+  apply_pixel("(B08-B04)/(B08+B04)", "NDVI") |>
+  aggregate_time("P3M") |>
+  extract_geom(sf, FUN = mean )
+ndvi
+```
 
     ## stars object with 3 dimensions and 1 attribute
-    ## attribute(s), summary of first 1e+05 cells:
-    ##             Min.    1st Qu.     Median       Mean   3rd Qu.      Max.
-    ## NDVI  -0.6376002 -0.1380293 0.02614136 0.05817926 0.2067806 0.9047929
+    ## attribute(s):
+    ##             Min.    1st Qu.      Median        Mean   3rd Qu.      Max. NA's
+    ## NDVI  -0.8625167 -0.2422783 -0.07264091 0.004162548 0.1849002 0.9294161   42
     ## dimension(s):
     ##      from   to offset      delta  refsys point                  values x/y
-    ## x       1 1001 -122.5  0.0001474  WGS 84    NA                    NULL [x]
-    ## y       1 1000  37.81 -9.867e-05  WGS 84    NA                    NULL [y]
+    ## x       1 1000 -122.5  0.0002102  WGS 84    NA                    NULL [x]
+    ## y       1 1000  37.86 -0.0001987  WGS 84    NA                    NULL [y]
     ## time    1    1     NA         NA POSIXct FALSE [2022-06-01,2022-09-01)
+
+``` r
+ave_ndvi
+```
 
     ## # A tibble: 97 × 3
     ##      FID time        NDVI
     ##    <int> <chr>      <dbl>
-    ##  1     1 2022-06-01 0.310
-    ##  2     2 2022-06-01 0.411
-    ##  3     3 2022-06-01 0.392
-    ##  4     4 2022-06-01 0.256
+    ##  1     1 2022-06-01 0.309
+    ##  2     2 2022-06-01 0.410
+    ##  3     3 2022-06-01 0.385
+    ##  4     4 2022-06-01 0.252
     ##  5     5 2022-06-01 0.298
-    ##  6     6 2022-06-01 0.381
-    ##  7     7 2022-06-01 0.302
-    ##  8     8 2022-06-01 0.238
-    ##  9     9 2022-06-01 0.308
+    ##  6     6 2022-06-01 0.377
+    ##  7     7 2022-06-01 0.303
+    ##  8     8 2022-06-01 0.236
+    ##  9     9 2022-06-01 0.309
     ## 10    10 2022-06-01 0.282
     ## # ℹ 87 more rows
 
@@ -194,15 +273,26 @@ is used as proxy measure of vegetation health, cover and phenology (life
 cycle stage) over large areas. It is calculated using multiple bands
 from satellite images.
 
+``` r
+ndvi2 <- ndvi |>st_as_stars()
+ndvi2[ndvi2 > 1] <- NA
+ndvi2[ndvi2 < -1] <- NA
+ndvi2
+```
+
     ## stars object with 3 dimensions and 1 attribute
-    ## attribute(s), summary of first 1e+05 cells:
-    ##             Min.    1st Qu.     Median       Mean   3rd Qu.      Max.
-    ## NDVI  -0.6376002 -0.1380293 0.02614136 0.05817926 0.2067806 0.9047929
+    ## attribute(s):
+    ##             Min.    1st Qu.      Median        Mean   3rd Qu.      Max. NA's
+    ## NDVI  -0.8625167 -0.2422783 -0.07264091 0.004162548 0.1849002 0.9294161   42
     ## dimension(s):
     ##      from   to offset      delta  refsys point                  values x/y
-    ## x       1 1001 -122.5  0.0001474  WGS 84    NA                    NULL [x]
-    ## y       1 1000  37.81 -9.867e-05  WGS 84    NA                    NULL [y]
+    ## x       1 1000 -122.5  0.0002102  WGS 84    NA                    NULL [x]
+    ## y       1 1000  37.86 -0.0001987  WGS 84    NA                    NULL [y]
     ## time    1    1     NA         NA POSIXct FALSE [2022-06-01,2022-09-01)
+
+``` r
+tmap_mode("plot")
+```
 
     ## tmap mode set to plotting
 
@@ -211,11 +301,13 @@ from satellite images.
 **Create a map which shows current (2019) mean NDVI across city
 redlining from the 1950s.**
 
-    ## stars object downsampled to 1000 by 999 cells. See tm_shape manual (argument raster.downsample)
+``` r
+tm_shape(ndvi2) + tm_raster(style = "quantile") + tm_shape(sf) + tm_polygons("holc_grade", alpha = 0.5)
+```
 
     ## Variable(s) "NA" contains positive and negative values, so midpoint is set to 0. Set midpoint = NA to show the full spectrum of the color palette.
 
-![](spatial-assignment_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+![](spatial-assignment_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 # Exercise 2
 
@@ -223,20 +315,29 @@ redlining from the 1950s.**
 distribution of pixel values across cities and neighborhoods. Show how
 the trends differ between cities.**
 
+``` r
+ave_ndvi |> as_tibble()
+```
+
     ## # A tibble: 97 × 3
     ##      FID time        NDVI
     ##    <int> <chr>      <dbl>
-    ##  1     1 2022-06-01 0.310
-    ##  2     2 2022-06-01 0.411
-    ##  3     3 2022-06-01 0.392
-    ##  4     4 2022-06-01 0.256
+    ##  1     1 2022-06-01 0.309
+    ##  2     2 2022-06-01 0.410
+    ##  3     3 2022-06-01 0.385
+    ##  4     4 2022-06-01 0.252
     ##  5     5 2022-06-01 0.298
-    ##  6     6 2022-06-01 0.381
-    ##  7     7 2022-06-01 0.302
-    ##  8     8 2022-06-01 0.238
-    ##  9     9 2022-06-01 0.308
+    ##  6     6 2022-06-01 0.377
+    ##  7     7 2022-06-01 0.303
+    ##  8     8 2022-06-01 0.236
+    ##  9     9 2022-06-01 0.309
     ## 10    10 2022-06-01 0.282
     ## # ℹ 87 more rows
+
+``` r
+sf2 <- sf |> rowid_to_column("FID")
+sf2
+```
 
     ## # A tibble: 97 × 5
     ##      FID name  holc_id holc_grade                                       geometry
@@ -253,34 +354,60 @@ the trends differ between cities.**
     ## 10    10 <NA>  A6      A          (((-122.4731 37.7346, -122.4724 37.73464, -12…
     ## # ℹ 87 more rows
 
+``` r
+ndvi_poly <- left_join(sf2 , ave_ndvi)
+```
+
     ## Joining with `by = join_by(FID)`
 
-    ## # A tibble: 95 × 7
+``` r
+ndvi_poly <- filter(ndvi_poly, NDVI > -1)
+ndvi_poly <- filter(ndvi_poly, NDVI < 1)
+ndvi_poly
+```
+
+    ## # A tibble: 97 × 7
     ##      FID name  holc_id holc_grade                           geometry time   NDVI
     ##    <int> <chr> <chr>   <chr>                      <MULTIPOLYGON [°]> <chr> <dbl>
-    ##  1     1 <NA>  A1      A          (((-122.4755 37.78687, -122.4755 … 2022… 0.310
-    ##  2     2 <NA>  A10     A          (((-122.4609 37.73566, -122.461 3… 2022… 0.411
-    ##  3     3 <NA>  A11     A          (((-122.4562 37.74046, -122.4566 … 2022… 0.392
-    ##  4     4 <NA>  A12     A          (((-122.4715 37.73326, -122.4665 … 2022… 0.256
+    ##  1     1 <NA>  A1      A          (((-122.4755 37.78687, -122.4755 … 2022… 0.309
+    ##  2     2 <NA>  A10     A          (((-122.4609 37.73566, -122.461 3… 2022… 0.410
+    ##  3     3 <NA>  A11     A          (((-122.4562 37.74046, -122.4566 … 2022… 0.385
+    ##  4     4 <NA>  A12     A          (((-122.4715 37.73326, -122.4665 … 2022… 0.252
     ##  5     5 <NA>  A13     A          (((-122.461 37.73572, -122.4609 3… 2022… 0.298
-    ##  6     6 <NA>  A2      A          (((-122.4593 37.78795, -122.4598 … 2022… 0.381
-    ##  7     7 <NA>  A3      A          (((-122.4472 37.78954, -122.4485 … 2022… 0.302
-    ##  8     8 <NA>  A4      A          (((-122.446 37.80388, -122.4458 3… 2022… 0.238
-    ##  9     9 <NA>  A5      A          (((-122.4463 37.79187, -122.447 3… 2022… 0.308
+    ##  6     6 <NA>  A2      A          (((-122.4593 37.78795, -122.4598 … 2022… 0.377
+    ##  7     7 <NA>  A3      A          (((-122.4472 37.78954, -122.4485 … 2022… 0.303
+    ##  8     8 <NA>  A4      A          (((-122.446 37.80388, -122.4458 3… 2022… 0.236
+    ##  9     9 <NA>  A5      A          (((-122.4463 37.79187, -122.447 3… 2022… 0.309
     ## 10    10 <NA>  A6      A          (((-122.4731 37.7346, -122.4724 3… 2022… 0.282
-    ## # ℹ 85 more rows
+    ## # ℹ 87 more rows
+
+``` r
+tmap_mode("plot")
+```
 
     ## tmap mode set to plotting
 
-![](spatial-assignment_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+``` r
+tm_basemap() + 
+tm_shape(ndvi_poly) + tm_polygons("NDVI", palette = "Greens") + 
+  tm_shape(ndvi_poly) + tm_text("holc_grade", size = 0.5)
+```
+
+![](spatial-assignment_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+
+``` r
+ndvi_poly |> as_tibble() |>
+  group_by(holc_grade) |>
+  summarise(mean_NDVI = mean(NDVI))
+```
 
     ## # A tibble: 4 × 2
     ##   holc_grade mean_NDVI
     ##   <chr>          <dbl>
-    ## 1 A              0.316
-    ## 2 B              0.211
-    ## 3 C              0.193
-    ## 4 D              0.182
+    ## 1 A              0.314
+    ## 2 B              0.209
+    ## 3 C              0.192
+    ## 4 D              0.191
 
 # Exercise 3:
 

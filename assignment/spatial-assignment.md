@@ -172,7 +172,7 @@ tm_shape(sf)+tm_polygons("holc_grade")
 
 ``` r
 ## STAC Search over 400 million assets.
-box <- c(xmin=-122.51020, ymin=37.65801, xmax=-122.30000, ymax=37.85668) 
+box <- c(xmin=-122.51, ymin=37.70, xmax=-122.35, ymax=37.82) 
 start_date <- "2022-06-01"
 end_date <- "2022-08-01"
 items <- 
@@ -224,13 +224,13 @@ ndvi
 
     ## stars object with 3 dimensions and 1 attribute
     ## attribute(s):
-    ##             Min.    1st Qu.      Median        Mean   3rd Qu.      Max. NA's
-    ## NDVI  -0.8625167 -0.2422783 -0.07264091 0.004162548 0.1849002 0.9294161   42
+    ##             Min.    1st Qu.     Median       Mean   3rd Qu.     Max. NA's
+    ## NDVI  -0.8775178 -0.1457742 0.07175477 0.09190989 0.2411625 0.932893   34
     ## dimension(s):
-    ##      from   to offset      delta  refsys point                  values x/y
-    ## x       1 1000 -122.5  0.0002102  WGS 84    NA                    NULL [x]
-    ## y       1 1000  37.86 -0.0001987  WGS 84    NA                    NULL [y]
-    ## time    1    1     NA         NA POSIXct FALSE [2022-06-01,2022-09-01)
+    ##      from   to offset    delta  refsys point                  values x/y
+    ## x       1 1000 -122.5  0.00016  WGS 84    NA                    NULL [x]
+    ## y       1 1000  37.82 -0.00012  WGS 84    NA                    NULL [y]
+    ## time    1    1     NA       NA POSIXct FALSE [2022-06-01,2022-09-01)
 
 ``` r
 ave_ndvi
@@ -241,14 +241,14 @@ ave_ndvi
     ##    <int> <chr>      <dbl>
     ##  1     1 2022-06-01 0.309
     ##  2     2 2022-06-01 0.410
-    ##  3     3 2022-06-01 0.385
-    ##  4     4 2022-06-01 0.252
-    ##  5     5 2022-06-01 0.298
-    ##  6     6 2022-06-01 0.377
-    ##  7     7 2022-06-01 0.303
-    ##  8     8 2022-06-01 0.236
+    ##  3     3 2022-06-01 0.387
+    ##  4     4 2022-06-01 0.253
+    ##  5     5 2022-06-01 0.299
+    ##  6     6 2022-06-01 0.389
+    ##  7     7 2022-06-01 0.302
+    ##  8     8 2022-06-01 0.239
     ##  9     9 2022-06-01 0.309
-    ## 10    10 2022-06-01 0.282
+    ## 10    10 2022-06-01 0.284
     ## # ℹ 87 more rows
 
 > “As you explore the materials Mapping Inequality, you will quickly
@@ -275,26 +275,18 @@ from satellite images.
 
 ``` r
 ndvi2 <- ndvi |>st_as_stars()
-ndvi2[ndvi2 > 1] <- NA
-ndvi2[ndvi2 < -1] <- NA
 ndvi2
 ```
 
     ## stars object with 3 dimensions and 1 attribute
     ## attribute(s):
-    ##             Min.    1st Qu.      Median        Mean   3rd Qu.      Max. NA's
-    ## NDVI  -0.8625167 -0.2422783 -0.07264091 0.004162548 0.1849002 0.9294161   42
+    ##             Min.    1st Qu.     Median       Mean   3rd Qu.     Max. NA's
+    ## NDVI  -0.8775178 -0.1457742 0.07175477 0.09190989 0.2411625 0.932893   34
     ## dimension(s):
-    ##      from   to offset      delta  refsys point                  values x/y
-    ## x       1 1000 -122.5  0.0002102  WGS 84    NA                    NULL [x]
-    ## y       1 1000  37.86 -0.0001987  WGS 84    NA                    NULL [y]
-    ## time    1    1     NA         NA POSIXct FALSE [2022-06-01,2022-09-01)
-
-``` r
-tmap_mode("plot")
-```
-
-    ## tmap mode set to plotting
+    ##      from   to offset    delta  refsys point                  values x/y
+    ## x       1 1000 -122.5  0.00016  WGS 84    NA                    NULL [x]
+    ## y       1 1000  37.82 -0.00012  WGS 84    NA                    NULL [y]
+    ## time    1    1     NA       NA POSIXct FALSE [2022-06-01,2022-09-01)
 
 # Exercise 1
 
@@ -324,14 +316,14 @@ ave_ndvi |> as_tibble()
     ##    <int> <chr>      <dbl>
     ##  1     1 2022-06-01 0.309
     ##  2     2 2022-06-01 0.410
-    ##  3     3 2022-06-01 0.385
-    ##  4     4 2022-06-01 0.252
-    ##  5     5 2022-06-01 0.298
-    ##  6     6 2022-06-01 0.377
-    ##  7     7 2022-06-01 0.303
-    ##  8     8 2022-06-01 0.236
+    ##  3     3 2022-06-01 0.387
+    ##  4     4 2022-06-01 0.253
+    ##  5     5 2022-06-01 0.299
+    ##  6     6 2022-06-01 0.389
+    ##  7     7 2022-06-01 0.302
+    ##  8     8 2022-06-01 0.239
     ##  9     9 2022-06-01 0.309
-    ## 10    10 2022-06-01 0.282
+    ## 10    10 2022-06-01 0.284
     ## # ℹ 87 more rows
 
 ``` r
@@ -361,8 +353,6 @@ ndvi_poly <- left_join(sf2 , ave_ndvi)
     ## Joining with `by = join_by(FID)`
 
 ``` r
-ndvi_poly <- filter(ndvi_poly, NDVI > -1)
-ndvi_poly <- filter(ndvi_poly, NDVI < 1)
 ndvi_poly
 ```
 
@@ -371,14 +361,14 @@ ndvi_poly
     ##    <int> <chr> <chr>   <chr>                      <MULTIPOLYGON [°]> <chr> <dbl>
     ##  1     1 <NA>  A1      A          (((-122.4755 37.78687, -122.4755 … 2022… 0.309
     ##  2     2 <NA>  A10     A          (((-122.4609 37.73566, -122.461 3… 2022… 0.410
-    ##  3     3 <NA>  A11     A          (((-122.4562 37.74046, -122.4566 … 2022… 0.385
-    ##  4     4 <NA>  A12     A          (((-122.4715 37.73326, -122.4665 … 2022… 0.252
-    ##  5     5 <NA>  A13     A          (((-122.461 37.73572, -122.4609 3… 2022… 0.298
-    ##  6     6 <NA>  A2      A          (((-122.4593 37.78795, -122.4598 … 2022… 0.377
-    ##  7     7 <NA>  A3      A          (((-122.4472 37.78954, -122.4485 … 2022… 0.303
-    ##  8     8 <NA>  A4      A          (((-122.446 37.80388, -122.4458 3… 2022… 0.236
+    ##  3     3 <NA>  A11     A          (((-122.4562 37.74046, -122.4566 … 2022… 0.387
+    ##  4     4 <NA>  A12     A          (((-122.4715 37.73326, -122.4665 … 2022… 0.253
+    ##  5     5 <NA>  A13     A          (((-122.461 37.73572, -122.4609 3… 2022… 0.299
+    ##  6     6 <NA>  A2      A          (((-122.4593 37.78795, -122.4598 … 2022… 0.389
+    ##  7     7 <NA>  A3      A          (((-122.4472 37.78954, -122.4485 … 2022… 0.302
+    ##  8     8 <NA>  A4      A          (((-122.446 37.80388, -122.4458 3… 2022… 0.239
     ##  9     9 <NA>  A5      A          (((-122.4463 37.79187, -122.447 3… 2022… 0.309
-    ## 10    10 <NA>  A6      A          (((-122.4731 37.7346, -122.4724 3… 2022… 0.282
+    ## 10    10 <NA>  A6      A          (((-122.4731 37.7346, -122.4724 3… 2022… 0.284
     ## # ℹ 87 more rows
 
 ``` r
@@ -404,10 +394,10 @@ ndvi_poly |> as_tibble() |>
     ## # A tibble: 4 × 2
     ##   holc_grade mean_NDVI
     ##   <chr>          <dbl>
-    ## 1 A              0.314
-    ## 2 B              0.209
-    ## 3 C              0.192
-    ## 4 D              0.191
+    ## 1 A              0.316
+    ## 2 B              0.210
+    ## 3 C              0.193
+    ## 4 D              0.192
 
 # Exercise 3:
 

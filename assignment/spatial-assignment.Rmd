@@ -77,7 +77,7 @@ tm_shape(sf)+tm_polygons("holc_grade")
 
 ```{r}
 ## STAC Search over 400 million assets.
-box <- c(xmin=-122.51020, ymin=37.65801, xmax=-122.30000, ymax=37.85668) 
+box <- c(xmin=-122.51, ymin=37.70, xmax=-122.35, ymax=37.82) 
 start_date <- "2022-06-01"
 end_date <- "2022-08-01"
 items <- 
@@ -135,10 +135,7 @@ NDVI is used as proxy measure of vegetation health, cover and phenology (life cy
 
 ```{r}
 ndvi2 <- ndvi |>st_as_stars()
-ndvi2[ndvi2 > 1] <- NA
-ndvi2[ndvi2 < -1] <- NA
 ndvi2
-tmap_mode("plot")
 ```
 
 
@@ -157,8 +154,6 @@ ave_ndvi |> as_tibble()
 sf2 <- sf |> rowid_to_column("FID")
 sf2
 ndvi_poly <- left_join(sf2 , ave_ndvi)
-ndvi_poly <- filter(ndvi_poly, NDVI > -1)
-ndvi_poly <- filter(ndvi_poly, NDVI < 1)
 ndvi_poly
 ```
 

@@ -1,12 +1,10 @@
 
-*add github actions badge here*
+[![Reproducibility](https://github.com/espm-157/spatial-spatial_xiangrong-jiawen/actions/workflows/main.yml/badge.svg)](https://github.com/espm-157/spatial-spatial_xiangrong-jiawen/actions/workflows/main.yml)
 
 ## Team Members:
 
+- Jiawen Tang, kjwtang
 - full name, github handle
-- full name, github handle
-
-This repository is a template for your team's repository.
 
 ## assignment
 

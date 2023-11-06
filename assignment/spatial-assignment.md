@@ -2,10 +2,35 @@ The ecological and evolutionary consequences of systemic racism
 ================
 Millie Chapman (GSI), Jiawen Tang, Mark Sun
 
+``` r
+knitr::opts_chunk$set(messages = FALSE, cache = FALSE, warning = FALSE)
+
+# # Install and load required packages
+# packages_to_install <- c("tmap", "terra", "tidyverse", "sf", "abind", "rstac", "gdalcubes", "stars", "jsonlite", "dplyr", "codetools")
+# 
+# # Check if the packages are installed, and if not, install them
+# for (package in packages_to_install) {
+#   if (!requireNamespace(package, quietly = TRUE)) {
+#     install.packages(package)
+#   }
+# }
+
+
+library(tmap)      #interactive maps, raster + vector layers
+```
+
     ## Breaking News: tmap 3.x is retiring. Please test v4, e.g. with
     ## remotes::install_github('r-tmap/tmap')
 
+``` r
+library(terra)       # Successor to the raster library
+```
+
     ## terra 1.7.55
+
+``` r
+library(tidyverse)   # our old friend
+```
 
     ## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.0 ──
 
@@ -19,7 +44,17 @@ Millie Chapman (GSI), Jiawen Tang, Mark Sun
     ## ✖ dplyr::filter()  masks stats::filter()
     ## ✖ dplyr::lag()     masks stats::lag()
 
+``` r
+library(sf)          # to work with simple features (vector) data
+```
+
     ## Linking to GEOS 3.10.2, GDAL 3.4.1, PROJ 8.2.1; sf_use_s2() is TRUE
+
+``` r
+library(abind)
+library(rstac)
+library(gdalcubes, verbose = FALSE)
+```
 
     ## 
     ## Attaching package: 'gdalcubes'
@@ -28,12 +63,23 @@ Millie Chapman (GSI), Jiawen Tang, Mark Sun
     ## 
     ##     animate, crop, size
 
+``` r
+library(stars)
+library(jsonlite)
+```
+
     ## 
     ## Attaching package: 'jsonlite'
 
     ## The following object is masked from 'package:purrr':
     ## 
     ##     flatten
+
+``` r
+library(dplyr)
+library(codetools)
+gdalcubes::gdalcubes_options(parallel = TRUE)
+```
 
 # Background
 

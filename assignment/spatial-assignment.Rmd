@@ -6,18 +6,19 @@ output:
     df_print: tibble
 ---
 
-```{r setup, messages = FALSE, cache = FALSE, echo = FALSE, warning = FALSE}
+```{r setup, messages = FALSE, cache = FALSE, warning = FALSE}
 knitr::opts_chunk$set(messages = FALSE, cache = FALSE, warning = FALSE)
 
-# Install and load required packages
-packages_to_install <- c("tmap", "terra", "tidyverse", "sf", "abind", "rstac", "gdalcubes", "stars", "jsonlite", "dplyr", "codetools")
+# # Install and load required packages
+# packages_to_install <- c("tmap", "terra", "tidyverse", "sf", "abind", "rstac", "gdalcubes", "stars", "jsonlite", "dplyr", "codetools")
+# 
+# # Check if the packages are installed, and if not, install them
+# for (package in packages_to_install) {
+#   if (!requireNamespace(package, quietly = TRUE)) {
+#     install.packages(package)
+#   }
+# }
 
-# Check if the packages are installed, and if not, install them
-for (package in packages_to_install) {
-  if (!requireNamespace(package, quietly = TRUE)) {
-    install.packages(package)
-  }
-}
 
 library(tmap)      #interactive maps, raster + vector layers
 library(terra)       # Successor to the raster library

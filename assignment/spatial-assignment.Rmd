@@ -162,3 +162,88 @@ ndvi_poly |> as_tibble() |>
 **Explain why considering systematic inequity and racism is important in the context of global change and developing solutions to the biodiversity crisis.**
 
 Considering the systematic inequality helps inform a more comprehensive understanding on the historical background of many environmental crisis today. For instance, despite climate change being a global environmental issue, systematic injustices and inequality has resulted in uneven harm against certain groups of people who are usually the least responsible for such crisis, and have minor financial or social influence. When developing solutions of biodiversity crisis, it's important to identify the most vulnerable regions/people that should be prioritized. Moreover, future solution including regeneration and sustainability should aim for redress the issues caused by historical inequality.
+
+
+```{r}
+fresno <-"https://dsl.richmond.edu/panorama/redlining/static/downloads/shapefiles/CAFresno1936.zip"
+
+fsurl <- paste0("/vsizip/vsicurl/",fresno)
+fs <- read_sf(fsurl)
+fs
+tmap_mode("plot")
+tm_shape(fs)+tm_polygons("holc_grade")
+```
+
+```{r}
+box <- st_bbox(fs)
+start_date <- "2022-06-01"
+end_date <- "2022-08-01"
+items <- 
+  stac("https://earth-search.aws.element84.com/v0/") |>
+  stac_search(collections = "sentinel-s2-l2a-cogs",
+              bbox = c(box),
+              datetime = paste(start_date, end_date, sep="/"),
+              limit = 100) |>
+  post_request() 
+
+col <-
+  stac_image_collection(items$features,
+                        asset_names = c("B02", "B03", "B04","B08", "SCL"),
+                        property_filter = \(x) {x[["eo:cloud_cover"]] < 20})
+fs_cube <- cube_view(srs = "EPSG:4326",  
+                  extent = list(t0 = start_date, t1 = "2022-08-31",
+                                left = box[1], right = box[3],
+                                top = box[4], bottom = box[2]),
+                  nx = 1000, ny = 1000, dt = "P1M",
+                  aggregation = "median", resampling = "average")
+```
+
+```{r}
+S2.mask <- image_mask("SCL", values=c(3,8,9)) # mask clouds and cloud shadows
+raster_cube(col, fs_cube, mask = S2.mask) |>
+  select_bands(c("B04", "B03", "B02")) |>
+  plot(rgb = 1:3)
+```
+
+```{r}
+fs_ndvi <- 
+  raster_cube(col, fs_cube, mask = S2.mask) |>
+  select_bands(c("B08", "B04")) |>
+  apply_pixel("(B08-B04)/(B08+B04)", "NDVI") |>
+  aggregate_time("P3M") |>
+  st_as_stars()
+```
+
+```{r}
+fs_ave_ndvi <-
+  raster_cube(col, fs_cube, mask = S2.mask) |>
+  select_bands(c("B08", "B04")) |>
+  apply_pixel("(B08-B04)/(B08+B04)", "NDVI") |>
+  aggregate_time("P3M") |>
+  extract_geom(fs, FUN = mean)
+fs_ndvi
+fs_ave_ndvi
+ndvi3 <- fs_ndvi |>st_as_stars()
+ndvi3
+tm_shape(ndvi3) + tm_raster(style = "quantile") + tm_shape(fs) + tm_polygons("holc_grade", alpha = 0.5)
+```
+```{r}
+fs_ave_ndvi |> as_tibble()
+fs2 <- fs |> rowid_to_column("FID")
+fs2
+ndvi_poly2 <- left_join(fs2 , fs_ave_ndvi)
+ndvi_poly2
+tmap_mode("plot")
+tm_basemap() + 
+tm_shape(ndvi_poly2) + tm_polygons("NDVI", palette = "Greens") + 
+  tm_shape(ndvi_poly2) + tm_text("holc_grade", size = 0.5)
+ndvi_poly2 |> as_tibble() |>
+  group_by(holc_grade) |>
+  summarise(mean_NDVI = mean(NDVI))
+```
+
+
+
+
+
+

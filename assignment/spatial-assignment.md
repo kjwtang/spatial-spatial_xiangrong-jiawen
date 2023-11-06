@@ -2,105 +2,50 @@ The ecological and evolutionary consequences of systemic racism
 ================
 Millie Chapman (GSI), Jiawen Tang, Mark Sun
 
-``` r
-knitr::opts_chunk$set(messages = FALSE, cache = FALSE, warning = FALSE)
-
-# Install and load required packages
-packages_to_install <- c("tmap", "terra", "tidyverse", "sf", "abind", "rstac", "gdalcubes", "stars", "jsonlite", "dplyr")
-
-# Check if the packages are installed, and if not, install them
-for (package in packages_to_install) {
-  if (!requireNamespace(package, quietly = TRUE)) {
-    install.packages(package)
-  }
-}
-
-library(tmap)      #interactive maps, raster + vector layers
-```
-
     ## Breaking News: tmap 3.x is retiring. Please test v4, e.g. with
     ## remotes::install_github('r-tmap/tmap')
 
-``` r
-library(terra)       # Successor to the raster library
-```
-
     ## terra 1.7.55
 
-``` r
-library(tidyverse)   # our old friend
-```
+    ## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.0 ──
 
-    ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-    ## ✔ dplyr     1.1.3     ✔ readr     2.1.4
-    ## ✔ forcats   1.0.0     ✔ stringr   1.5.0
-    ## ✔ ggplot2   3.4.4     ✔ tibble    3.2.1
-    ## ✔ lubridate 1.9.3     ✔ tidyr     1.3.0
-    ## ✔ purrr     1.0.2
+    ## ✔ ggplot2 3.4.4     ✔ purrr   1.0.2
+    ## ✔ tibble  3.2.1     ✔ dplyr   1.1.3
+    ## ✔ tidyr   1.3.0     ✔ stringr 1.5.0
+    ## ✔ readr   2.1.4     ✔ forcats 1.0.0
 
     ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
     ## ✖ tidyr::extract() masks terra::extract()
     ## ✖ dplyr::filter()  masks stats::filter()
     ## ✖ dplyr::lag()     masks stats::lag()
-    ## ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
-
-``` r
-library(sf)          # to work with simple features (vector) data
-```
 
     ## Linking to GEOS 3.10.2, GDAL 3.4.1, PROJ 8.2.1; sf_use_s2() is TRUE
 
-``` r
-library(abind)
-library(rstac)
-library(gdalcubes, verbose = FALSE)
-```
-
     ## 
     ## Attaching package: 'gdalcubes'
-    ## 
+
     ## The following objects are masked from 'package:terra':
     ## 
     ##     animate, crop, size
 
-``` r
-library(stars)
-library(jsonlite)
-```
-
     ## 
     ## Attaching package: 'jsonlite'
-    ## 
+
     ## The following object is masked from 'package:purrr':
     ## 
     ##     flatten
 
-``` r
-library(dplyr)
-gdalcubes::gdalcubes_options(parallel = TRUE)
-```
-
-## Learning objectives
-
-This module provides an introduction to the fundamentals of working with
-spatial vector and raster data in R while empirically exploring why
-systematic and structural racism is interwined with urban ecological
-processes. This module uses the Simple Features Access standard (ISO
-19125) and tidyverse-style workflow using the sf package and emerging
-ecosystem of r-spatial tools.
-
-# Exercise
+# Background
 
 In August 2020, [Christopher
 Schell](http://directory.tacoma.uw.edu/employee/cjschell) and collegues
 published a review in *Science* on [‘The ecological and evolutionary
 consequences of systemic racism in urban
 environments’](https://science.sciencemag.org/content/early/2020/08/12/science.aay4497)
-(DOI: 10.1126/science.aay4497), showing how systematic racism and
-classism has significant impacts on ecological and evolutionary
-processes within urban environments. Here we explore a subset of the
-data used to support these findings in this review and the broader
-literature.
+, showing how systematic racism and classism has significant impacts on
+ecological and evolutionary processes within urban environments. Here we
+explore a subset of the data used to support these findings in this
+review and the broader literature.
 
 The [press
 release](https://www.washington.edu/news/2020/08/13/systemic-racism-has-consequences-for-all-life-in-cities/)
@@ -118,22 +63,24 @@ In the paper, Schell writes:
 > “In multiple cases, neighborhood racial composition can be a stronger
 > predictor of urban socio-ecological patterns than wealth.”
 
-We are going to explore one metric for how structural racism and
-classism underpin landscape heterogeneity in cities.
-
 **Figure 2** in the Schell paper shows how NDVI (Normalized Difference
 Vegetation Index) tracks historical redlining. ![Fig.
 1.](figures/fig2.png)
 
-We are going to recreate these city maps, and plot the distributions and
-mean vegetation patterns across cities to explore the structural
-inequality and racism that Schell et al highlight in their paper.
+In this report, we explored one metric for how structural racism and
+classism underpin landscape heterogeneity in cities. We recreated the
+city map of San Francisco, and plot the distributions and mean
+vegetation patterns to explore the structural inequality and racism that
+Schell et al highlight in their paper. We used the following spatial
+data to do this:
 
-To do this we are going to use the following spatial data:
-
-**1.Mapping Inequality:** (vector data)  
-Please take the time to read the introduction to this dataset
-[here](https://dsl.richmond.edu/panorama/redlining/#loc=3/41.245/-105.469&text=intro)
+**1.Mapping Inequality:**  
+The introduction to the dataset we used is
+[here](https://dsl.richmond.edu/panorama/redlining/#loc=3/41.245/-105.469&text=intro).
+The “holc_grade” column represents the assigned grades to residential
+neighborhoods that reflected their “mortgage security” from minimal risk
+to being hazardous. We will then visualize these grades on color-coded
+maps.
 
 ``` r
 sfzip <-"https://dsl.richmond.edu/panorama/redlining/static/downloads/shapefiles/CASanFrancisco1937.zip"
@@ -288,10 +235,7 @@ ndvi2
     ## y       1 1000  37.82 -0.00012  WGS 84    NA                    NULL [y]
     ## time    1    1     NA       NA POSIXct FALSE [2022-06-01,2022-09-01)
 
-# Exercise 1
-
-**Create a map which shows current (2019) mean NDVI across city
-redlining from the 1950s.**
+# Map of current (2019) mean NDVI across city redlining from the 1950s.
 
 ``` r
 tm_shape(ndvi2) + tm_raster(style = "quantile") + tm_shape(sf) + tm_polygons("holc_grade", alpha = 0.5)
@@ -404,3 +348,14 @@ ndvi_poly |> as_tibble() |>
 **Explain why considering systematic inequity and racism is important in
 the context of global change and developing solutions to the
 biodiversity crisis.**
+
+Considering the systematic inequality helps inform a more comprehensive
+understanding on the historical background of many environmental crisis
+today. For instance, despite climate change being a global environmental
+issue, systematic injustices and inequality has resulted in uneven harm
+against certain groups of people who are usually the least responsible
+for such crisis, and have minor financial or social influence. When
+developing solutions of biodiversity crisis, it’s important to identify
+the most vulnerable regions/people that should be prioritized. Moreover,
+future solution including regeneration and sustainability should aim for
+redress the issues caused by historical inequality.

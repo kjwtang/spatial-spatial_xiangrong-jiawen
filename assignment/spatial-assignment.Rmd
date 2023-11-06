@@ -139,8 +139,7 @@ ndvi2
 ```
 
 
-# Exercise 1
-**Create a map which shows current (2019) mean NDVI across city redlining from the 1950s.**
+# Map of current (2019) mean NDVI across city redlining from the 1950s.
 
 ```{r}
 tm_shape(ndvi2) + tm_raster(style = "quantile") + tm_shape(sf) + tm_polygons("holc_grade", alpha = 0.5)
@@ -173,4 +172,9 @@ ndvi_poly |> as_tibble() |>
 
 # Exercise 3: 
 **Explain why considering systematic inequity and racism is important in the context of global change and developing solutions to the biodiversity crisis.**
+
+Considering the systematic inequality helps inform a more comprehensive understanding on the historical background of many environmental crisis today. For instance, despite climate change being a global environmental issue, systematic injustices and inequality has resulted in uneven harm against certain groups of people who are usually the least responsible for such crisis, and have minor financial or social influence. When developing solutions of biodiversity crisis, it's important to identify the most vulnerable regions/people that should be prioritized. Moreover, future solution including regeneration and sustainability should aim for redress the issues caused by historical inequality.
+
+
+
 

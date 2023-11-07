@@ -2,35 +2,17 @@ The ecological and evolutionary consequences of systemic racism
 ================
 Millie Chapman (GSI), Jiawen Tang, Mark Sun
 
+Create the Environment before start:
+
 ``` r
-knitr::opts_chunk$set(messages = FALSE, cache = FALSE, warning = FALSE)
-
-# # Install and load required packages
-# packages_to_install <- c("tmap", "terra", "tidyverse", "sf", "abind", "rstac", "gdalcubes", "stars", "jsonlite", "dplyr", "codetools")
-# 
-# # Check if the packages are installed, and if not, install them
-# for (package in packages_to_install) {
-#   if (!requireNamespace(package, quietly = TRUE)) {
-#     install.packages(package)
-#   }
-# }
-
-
-library(tmap)      #interactive maps, raster + vector layers
+#install these for the first time to run
+#install.packages(c('gdalcubes','tmap','rstac','jsonlite','condtools'))
 ```
 
     ## Breaking News: tmap 3.x is retiring. Please test v4, e.g. with
     ## remotes::install_github('r-tmap/tmap')
 
-``` r
-library(terra)       # Successor to the raster library
-```
-
     ## terra 1.7.55
-
-``` r
-library(tidyverse)   # our old friend
-```
 
     ## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.0 ──
 
@@ -44,17 +26,7 @@ library(tidyverse)   # our old friend
     ## ✖ dplyr::filter()  masks stats::filter()
     ## ✖ dplyr::lag()     masks stats::lag()
 
-``` r
-library(sf)          # to work with simple features (vector) data
-```
-
     ## Linking to GEOS 3.10.2, GDAL 3.4.1, PROJ 8.2.1; sf_use_s2() is TRUE
-
-``` r
-library(abind)
-library(rstac)
-library(gdalcubes, verbose = FALSE)
-```
 
     ## 
     ## Attaching package: 'gdalcubes'
@@ -63,23 +35,12 @@ library(gdalcubes, verbose = FALSE)
     ## 
     ##     animate, crop, size
 
-``` r
-library(stars)
-library(jsonlite)
-```
-
     ## 
     ## Attaching package: 'jsonlite'
 
     ## The following object is masked from 'package:purrr':
     ## 
     ##     flatten
-
-``` r
-library(dplyr)
-library(codetools)
-gdalcubes::gdalcubes_options(parallel = TRUE)
-```
 
 # Background
 
@@ -120,7 +81,9 @@ vegetation patterns to explore the structural inequality and racism that
 Schell et al highlight in their paper. We used the following spatial
 data to do this:
 
-**1.Mapping Inequality:**  
+# **1.Mapping Inequality:**
+
+  
 The introduction to the dataset we used is
 [here](https://dsl.richmond.edu/panorama/redlining/#loc=3/41.245/-105.469&text=intro).
 The “holc_grade” column represents the assigned grades to residential
@@ -128,30 +91,17 @@ neighborhoods that reflected their “mortgage security” from minimal risk
 to being hazardous. We will then visualize these grades on color-coded
 maps.
 
+In this case, we will use San Francisco as an example to show and using
+Fresno to compare. This is the visualization of the Redlining in San
+Francisco Area. Note that current downtown and the near-shore area are
+all in low grade (C or D), indicates they were poor or color residence
+area before.
+
 ``` r
 sfzip <-"https://dsl.richmond.edu/panorama/redlining/static/downloads/shapefiles/CASanFrancisco1937.zip"
 
 sfurl <- paste0("/vsizip/vsicurl/",sfzip)
 sf <- read_sf(sfurl)
-sf
-```
-
-    ## # A tibble: 97 × 4
-    ##    name  holc_id holc_grade                                             geometry
-    ##    <chr> <chr>   <chr>                                        <MULTIPOLYGON [°]>
-    ##  1 <NA>  A1      A          (((-122.4755 37.78687, -122.4755 37.78625, -122.476…
-    ##  2 <NA>  A10     A          (((-122.4609 37.73566, -122.461 37.73572, -122.4613…
-    ##  3 <NA>  A11     A          (((-122.4562 37.74046, -122.4566 37.74032, -122.456…
-    ##  4 <NA>  A12     A          (((-122.4715 37.73326, -122.4665 37.73307, -122.465…
-    ##  5 <NA>  A13     A          (((-122.461 37.73572, -122.4609 37.73566, -122.4605…
-    ##  6 <NA>  A2      A          (((-122.4593 37.78795, -122.4598 37.78788, -122.459…
-    ##  7 <NA>  A3      A          (((-122.4472 37.78954, -122.4485 37.78935, -122.454…
-    ##  8 <NA>  A4      A          (((-122.446 37.80388, -122.4458 37.80235, -122.4456…
-    ##  9 <NA>  A5      A          (((-122.4463 37.79187, -122.447 37.7966, -122.4463 …
-    ## 10 <NA>  A6      A          (((-122.4731 37.7346, -122.4724 37.73464, -122.4723…
-    ## # ℹ 87 more rows
-
-``` r
 tmap_mode("plot")
 ```
 
@@ -163,21 +113,34 @@ tm_shape(sf)+tm_polygons("holc_grade")
 
 ![](spatial-assignment_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
 
+# **2.Normalized Difference Vegetation Index (NDVI)**
+
+NDVI is used as proxy measure of vegetation health, cover and phenology
+(life cycle stage) over large areas. It is calculated using multiple
+bands from satellite images.
+
+Now we know the area that we are interested in based on the holc_grade
+graph, we will start finding the NDVI, Normalized Difference Vegetation
+Index in the near summer. NDVI stands for the “greeness” of the land,
+with higher value indicates higher reflection in green wavelength,
+suggesting more vegetation. Dr. Jim Tucker wants us using
+“photosynthesis capacity” to describe NDVI, as it reflects more the
+ability of the land to absorb wavelength. In previous studies, there is
+a strong correlation of NDVI with wealth, since green space is a luxury
+product in most place of America.
+
 ``` r
 ## STAC Search over 400 million assets.
-box <- c(xmin=-122.51, ymin=37.70, xmax=-122.35, ymax=37.82) 
+box <- st_bbox(sf) 
 start_date <- "2022-06-01"
 end_date <- "2022-08-01"
 items <- 
   stac("https://earth-search.aws.element84.com/v0/") |>
   stac_search(collections = "sentinel-s2-l2a-cogs",
-              bbox = box,
+              bbox = c(box),
               datetime = paste(start_date, end_date, sep="/"),
               limit = 100) |>
   post_request() 
-```
-
-``` r
 col <-
   stac_image_collection(items$features,
                         asset_names = c("B02", "B03", "B04","B08", "SCL"),
@@ -188,44 +151,29 @@ cube <- cube_view(srs = "EPSG:4326",
                                 top = box[4], bottom = box[2]),
                   nx = 1000, ny = 1000, dt = "P1M",
                   aggregation = "median", resampling = "average")
-```
-
-``` r
 S2.mask <- image_mask("SCL", values=c(3,8,9)) # mask clouds and cloud shadows
 raster_cube(col, cube, mask = S2.mask) |>
   select_bands(c("B04", "B03", "B02")) |>
   plot(rgb = 1:3)
 ```
 
-![](spatial-assignment_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+![](spatial-assignment_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+
+We selected the location (San Francisco), the time (summer 2022), the
+data source (ESA Sentinel-2), and the means to remove the cloud cover.
+At present, we will carry out the calculation of NDVI. NDVI is
+calculated as a ratio between the red (R) and near infrared (NIR) values
+in traditional fashion: (NIR - R) / (NIR + R). We will need a raster
+format ndvi and an average ndvi per holc_grade.
 
 ``` r
 ndvi <- 
   raster_cube(col, cube, mask = S2.mask) |>
   select_bands(c("B08", "B04")) |>
   apply_pixel("(B08-B04)/(B08+B04)", "NDVI") |>
-  aggregate_time("P3M") |>
-  st_as_stars()
-ave_ndvi <-
-  raster_cube(col, cube, mask = S2.mask) |>
-  select_bands(c("B08", "B04")) |>
-  apply_pixel("(B08-B04)/(B08+B04)", "NDVI") |>
-  aggregate_time("P3M") |>
-  extract_geom(sf, FUN = mean )
-ndvi
-```
-
-    ## stars object with 3 dimensions and 1 attribute
-    ## attribute(s):
-    ##             Min.    1st Qu.     Median       Mean   3rd Qu.     Max. NA's
-    ## NDVI  -0.8775178 -0.1457742 0.07175477 0.09190989 0.2411625 0.932893   34
-    ## dimension(s):
-    ##      from   to offset    delta  refsys point                  values x/y
-    ## x       1 1000 -122.5  0.00016  WGS 84    NA                    NULL [x]
-    ## y       1 1000  37.82 -0.00012  WGS 84    NA                    NULL [y]
-    ## time    1    1     NA       NA POSIXct FALSE [2022-06-01,2022-09-01)
-
-``` r
+  aggregate_time("P3M")
+ave_ndvi <- ndvi |> extract_geom(sf, FUN = mean )
+ndvi2 <- ndvi |>st_as_stars()
 ave_ndvi
 ```
 
@@ -233,16 +181,30 @@ ave_ndvi
     ##      FID time        NDVI
     ##    <int> <chr>      <dbl>
     ##  1     1 2022-06-01 0.309
-    ##  2     2 2022-06-01 0.410
-    ##  3     3 2022-06-01 0.387
-    ##  4     4 2022-06-01 0.253
+    ##  2     2 2022-06-01 0.411
+    ##  3     3 2022-06-01 0.388
+    ##  4     4 2022-06-01 0.254
     ##  5     5 2022-06-01 0.299
-    ##  6     6 2022-06-01 0.389
+    ##  6     6 2022-06-01 0.390
     ##  7     7 2022-06-01 0.302
     ##  8     8 2022-06-01 0.239
-    ##  9     9 2022-06-01 0.309
-    ## 10    10 2022-06-01 0.284
+    ##  9     9 2022-06-01 0.310
+    ## 10    10 2022-06-01 0.283
     ## # ℹ 87 more rows
+
+``` r
+ndvi2
+```
+
+    ## stars object with 3 dimensions and 1 attribute
+    ## attribute(s):
+    ##            Min.    1st Qu.    Median      Mean   3rd Qu.      Max. NA's
+    ## NDVI  -0.867543 0.02683389 0.1114082 0.1533023 0.2895219 0.9340307   44
+    ## dimension(s):
+    ##      from   to offset      delta  refsys point                  values x/y
+    ## x       1 1000 -122.5  0.0001474  WGS 84    NA                    NULL [x]
+    ## y       1 1000  37.81 -9.867e-05  WGS 84    NA                    NULL [y]
+    ## time    1    1     NA         NA POSIXct FALSE [2022-06-01,2022-09-01)
 
 > “As you explore the materials Mapping Inequality, you will quickly
 > encounter exactly that kind of language, descriptions of
@@ -261,41 +223,25 @@ ave_ndvi
 > to grapple with this history of government policies contributing to
 > inequality.”
 
-**2.Normalized Difference Vegetation Index (NDVI)** (raster data) NDVI
-is used as proxy measure of vegetation health, cover and phenology (life
-cycle stage) over large areas. It is calculated using multiple bands
-from satellite images.
+## Map of current (2019) mean NDVI across city redlining from the 1950s.
+
+At present, we already have the ndvi data, and we want to make sure that
+the area of the two data is the same before directly displaying the ndvi
+data within each tier. The following image will stack our NDVI map with
+holc_grade.
 
 ``` r
-ndvi2 <- ndvi |>st_as_stars()
-ndvi2
-```
-
-    ## stars object with 3 dimensions and 1 attribute
-    ## attribute(s):
-    ##             Min.    1st Qu.     Median       Mean   3rd Qu.     Max. NA's
-    ## NDVI  -0.8775178 -0.1457742 0.07175477 0.09190989 0.2411625 0.932893   34
-    ## dimension(s):
-    ##      from   to offset    delta  refsys point                  values x/y
-    ## x       1 1000 -122.5  0.00016  WGS 84    NA                    NULL [x]
-    ## y       1 1000  37.82 -0.00012  WGS 84    NA                    NULL [y]
-    ## time    1    1     NA       NA POSIXct FALSE [2022-06-01,2022-09-01)
-
-# Map of current (2019) mean NDVI across city redlining from the 1950s.
-
-``` r
-tm_shape(ndvi2) + tm_raster(style = "quantile") + tm_shape(sf) + tm_polygons("holc_grade", alpha = 0.5)
+tm_shape(ndvi2) + tm_raster(style = "quantile") + tm_shape(sf) + tm_polygons("holc_grade", alpha = 0.5) + tm_layout(legend.outside=TRUE)
 ```
 
     ## Variable(s) "NA" contains positive and negative values, so midpoint is set to 0. Set midpoint = NA to show the full spectrum of the color palette.
 
-![](spatial-assignment_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+![](spatial-assignment_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
-# Exercise 2
+# 3. NDVI
 
-**Plot the average NDVI values in different neighborhoods as well as the
-distribution of pixel values across cities and neighborhoods. Show how
-the trends differ between cities.**
+Now that we have average NDVI data, we can plot the NDVI of specific sub
+districts in San Francisco.
 
 ``` r
 ave_ndvi |> as_tibble()
@@ -305,61 +251,23 @@ ave_ndvi |> as_tibble()
     ##      FID time        NDVI
     ##    <int> <chr>      <dbl>
     ##  1     1 2022-06-01 0.309
-    ##  2     2 2022-06-01 0.410
-    ##  3     3 2022-06-01 0.387
-    ##  4     4 2022-06-01 0.253
+    ##  2     2 2022-06-01 0.411
+    ##  3     3 2022-06-01 0.388
+    ##  4     4 2022-06-01 0.254
     ##  5     5 2022-06-01 0.299
-    ##  6     6 2022-06-01 0.389
+    ##  6     6 2022-06-01 0.390
     ##  7     7 2022-06-01 0.302
     ##  8     8 2022-06-01 0.239
-    ##  9     9 2022-06-01 0.309
-    ## 10    10 2022-06-01 0.284
+    ##  9     9 2022-06-01 0.310
+    ## 10    10 2022-06-01 0.283
     ## # ℹ 87 more rows
 
 ``` r
 sf2 <- sf |> rowid_to_column("FID")
-sf2
-```
-
-    ## # A tibble: 97 × 5
-    ##      FID name  holc_id holc_grade                                       geometry
-    ##    <int> <chr> <chr>   <chr>                                  <MULTIPOLYGON [°]>
-    ##  1     1 <NA>  A1      A          (((-122.4755 37.78687, -122.4755 37.78625, -1…
-    ##  2     2 <NA>  A10     A          (((-122.4609 37.73566, -122.461 37.73572, -12…
-    ##  3     3 <NA>  A11     A          (((-122.4562 37.74046, -122.4566 37.74032, -1…
-    ##  4     4 <NA>  A12     A          (((-122.4715 37.73326, -122.4665 37.73307, -1…
-    ##  5     5 <NA>  A13     A          (((-122.461 37.73572, -122.4609 37.73566, -12…
-    ##  6     6 <NA>  A2      A          (((-122.4593 37.78795, -122.4598 37.78788, -1…
-    ##  7     7 <NA>  A3      A          (((-122.4472 37.78954, -122.4485 37.78935, -1…
-    ##  8     8 <NA>  A4      A          (((-122.446 37.80388, -122.4458 37.80235, -12…
-    ##  9     9 <NA>  A5      A          (((-122.4463 37.79187, -122.447 37.7966, -122…
-    ## 10    10 <NA>  A6      A          (((-122.4731 37.7346, -122.4724 37.73464, -12…
-    ## # ℹ 87 more rows
-
-``` r
 ndvi_poly <- left_join(sf2 , ave_ndvi)
 ```
 
     ## Joining with `by = join_by(FID)`
-
-``` r
-ndvi_poly
-```
-
-    ## # A tibble: 97 × 7
-    ##      FID name  holc_id holc_grade                           geometry time   NDVI
-    ##    <int> <chr> <chr>   <chr>                      <MULTIPOLYGON [°]> <chr> <dbl>
-    ##  1     1 <NA>  A1      A          (((-122.4755 37.78687, -122.4755 … 2022… 0.309
-    ##  2     2 <NA>  A10     A          (((-122.4609 37.73566, -122.461 3… 2022… 0.410
-    ##  3     3 <NA>  A11     A          (((-122.4562 37.74046, -122.4566 … 2022… 0.387
-    ##  4     4 <NA>  A12     A          (((-122.4715 37.73326, -122.4665 … 2022… 0.253
-    ##  5     5 <NA>  A13     A          (((-122.461 37.73572, -122.4609 3… 2022… 0.299
-    ##  6     6 <NA>  A2      A          (((-122.4593 37.78795, -122.4598 … 2022… 0.389
-    ##  7     7 <NA>  A3      A          (((-122.4472 37.78954, -122.4485 … 2022… 0.302
-    ##  8     8 <NA>  A4      A          (((-122.446 37.80388, -122.4458 3… 2022… 0.239
-    ##  9     9 <NA>  A5      A          (((-122.4463 37.79187, -122.447 3… 2022… 0.309
-    ## 10    10 <NA>  A6      A          (((-122.4731 37.7346, -122.4724 3… 2022… 0.284
-    ## # ℹ 87 more rows
 
 ``` r
 tmap_mode("plot")
@@ -370,10 +278,16 @@ tmap_mode("plot")
 ``` r
 tm_basemap() + 
 tm_shape(ndvi_poly) + tm_polygons("NDVI", palette = "Greens") + 
-  tm_shape(ndvi_poly) + tm_text("holc_grade", size = 0.5)
+  tm_shape(ndvi_poly) + tm_text("holc_grade", size = 0.5) + 
+  tm_layout(legend.outside=TRUE)
 ```
 
-![](spatial-assignment_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+![](spatial-assignment_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+
+## NDVI Average in each Grade of Land:
+
+Now that we know the mean between each block, can we verify it with the
+overall mean? We can calculate this by taking some simple averages:
 
 ``` r
 ndvi_poly |> as_tibble() |>
@@ -386,8 +300,137 @@ ndvi_poly |> as_tibble() |>
     ##   <chr>          <dbl>
     ## 1 A              0.316
     ## 2 B              0.210
-    ## 3 C              0.193
-    ## 4 D              0.192
+    ## 3 C              0.194
+    ## 4 D              0.193
+
+These data reflect that region A has significantly higher NDVI values.
+Since NDVI is normalized as a result, the difference between 0.1 will be
+very large in reality. The overall gap of BCD is small. As Redlining’s
+zoning is dominated by D, it cannot be proved that Redlining has a
+direct relationship with lower NDVI based on a single case in San
+Francisco.
+
+## Fresno as Comparison
+
+We will use Fresno, an inland city, for comparison to increase
+scientific significance. Fresno’s process will merge directly and
+present the result as an image and the final mean:
+
+``` r
+fresno <-"https://dsl.richmond.edu/panorama/redlining/static/downloads/shapefiles/CAFresno1936.zip"
+
+fsurl <- paste0("/vsizip/vsicurl/",fresno)
+fs <- read_sf(fsurl)
+tmap_mode("plot")
+```
+
+    ## tmap mode set to plotting
+
+``` r
+tm_shape(fs)+tm_polygons("holc_grade")
+```
+
+![](spatial-assignment_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+
+``` r
+box <- st_bbox(fs)
+start_date <- "2022-06-01"
+end_date <- "2022-08-01"
+items <- 
+  stac("https://earth-search.aws.element84.com/v0/") |>
+  stac_search(collections = "sentinel-s2-l2a-cogs",
+              bbox = c(box),
+              datetime = paste(start_date, end_date, sep="/"),
+              limit = 100) |>
+  post_request() 
+
+col <-
+  stac_image_collection(items$features,
+                        asset_names = c("B02", "B03", "B04","B08", "SCL"),
+                        property_filter = \(x) {x[["eo:cloud_cover"]] < 20})
+fs_cube <- cube_view(srs = "EPSG:4326",  
+                  extent = list(t0 = start_date, t1 = "2022-08-31",
+                                left = box[1], right = box[3],
+                                top = box[4], bottom = box[2]),
+                  nx = 1000, ny = 1000, dt = "P1M",
+                  aggregation = "median", resampling = "average")
+S2.mask <- image_mask("SCL", values=c(3,8,9))
+fs_ndvi <- 
+  raster_cube(col, fs_cube, mask = S2.mask) |>
+  select_bands(c("B08", "B04")) |>
+  apply_pixel("(B08-B04)/(B08+B04)", "NDVI") |>
+  aggregate_time("P3M")
+fs_ave_ndvi <- fs_ndvi |> extract_geom(fs, FUN = mean)
+ndvi3 <- fs_ndvi |>st_as_stars()
+tm_shape(ndvi3) + tm_raster(style = "quantile") + tm_shape(fs) + tm_polygons("holc_grade", alpha = 0.5)+ tm_layout(legend.outside=TRUE)
+```
+
+    ## Variable(s) "NA" contains positive and negative values, so midpoint is set to 0. Set midpoint = NA to show the full spectrum of the color palette.
+
+![](spatial-assignment_files/figure-gfm/unnamed-chunk-8-2.png)<!-- -->
+
+``` r
+fs_ave_ndvi |> as_tibble()
+```
+
+    ## # A tibble: 24 × 3
+    ##      FID time        NDVI
+    ##    <int> <chr>      <dbl>
+    ##  1     1 2022-06-01 0.400
+    ##  2     2 2022-06-01 0.391
+    ##  3     3 2022-06-01 0.417
+    ##  4     4 2022-06-01 0.307
+    ##  5     5 2022-06-01 0.250
+    ##  6     6 2022-06-01 0.340
+    ##  7     7 2022-06-01 0.256
+    ##  8     8 2022-06-01 0.255
+    ##  9     9 2022-06-01 0.262
+    ## 10    10 2022-06-01 0.246
+    ## # ℹ 14 more rows
+
+``` r
+fs2 <- fs |> rowid_to_column("FID")
+ndvi_poly2 <- left_join(fs2 , fs_ave_ndvi)
+```
+
+    ## Joining with `by = join_by(FID)`
+
+``` r
+tmap_mode("plot")
+```
+
+    ## tmap mode set to plotting
+
+``` r
+tm_basemap() + 
+tm_shape(ndvi_poly2) + tm_polygons("NDVI", palette = "Greens") + 
+  tm_shape(ndvi_poly2) + tm_text("holc_grade", size = 0.5)+ 
+  tm_layout(legend.outside=TRUE)
+```
+
+![](spatial-assignment_files/figure-gfm/unnamed-chunk-8-3.png)<!-- -->
+
+``` r
+ndvi_poly2 |> as_tibble() |>
+  group_by(holc_grade) |>
+  summarise(mean_NDVI = mean(NDVI))
+```
+
+    ## # A tibble: 4 × 2
+    ##   holc_grade mean_NDVI
+    ##   <chr>          <dbl>
+    ## 1 A              0.396
+    ## 2 B              0.314
+    ## 3 C              0.229
+    ## 4 D              0.207
+
+Fresno is a famous agricultural city, and during the planting period, we
+can expect a high NDVI (any plant has a high NDVI, and in the city area
+and density are more important than the type of plant). When the overall
+Sample value was large, we found that the NDVI value of area D, where
+Redlining was located, was significantly lower. These two very different
+cities together suggest that NDVI is partly proof that the social
+science impact of Redlining still lives on today.
 
 # Exercise 3:
 

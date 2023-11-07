@@ -6,7 +6,7 @@ output:
     df_print: tibble
 ---
 
-Create the Environment before start:
+Create the Environment before starting:
 
 ```{r}
 #install these for the first time to run
@@ -61,7 +61,7 @@ In this report, we explored one metric for how structural racism and classism un
 \
 The introduction to the dataset we used is [here](https://dsl.richmond.edu/panorama/redlining/#loc=3/41.245/-105.469&text=intro). The "holc_grade" column represents the assigned grades to residential neighborhoods that reflected their "mortgage security" from minimal risk to being hazardous. We will then visualize these grades on color-coded maps.
 
-In this case, we will use San Francisco as an example to show and using Fresno to compare. This is the visualization of the Redlining in San Francisco Area. Note that current downtown and the near-shore area are all in low grade (C or D), indicates they were poor or color residence area before.
+In this case, we will use San Francisco as an example to visualize the environmental injustice caused by historical Redlining. We will then be using Fresno for comparison. The grade is not randomly distributed within blocks. For instance, almost all regions with low grade (C or D) locate in current near-shore area, indicating they were poor or color residence area before.Western San Francisco has significanrlt better environmental condition and consists of mostly best-ranked blocks (A and B). This map clearly shows the spatial inequality of historical Redlining.
 
 ```{r}
 sfzip <-"https://dsl.richmond.edu/panorama/redlining/static/downloads/shapefiles/CASanFrancisco1937.zip"
@@ -74,9 +74,9 @@ tm_shape(sf)+tm_polygons("holc_grade")
 
 # **2.Normalized Difference Vegetation Index (NDVI)**
 
-NDVI is used as proxy measure of vegetation health, cover and phenology (life cycle stage) over large areas. It is calculated using multiple bands from satellite images.
+NDVI is used as proxy measure of vegetation health, cover and phenology (life cycle stage) over large areas. It is calculated using multiple bands (NIR - R) / (NIR + R) from satellite images.
 
-Now we know the area that we are interested in based on the holc_grade graph, we will start finding the NDVI, Normalized Difference Vegetation Index in the near summer. NDVI stands for the "greeness" of the land, with higher value indicates higher reflection in green wavelength, suggesting more vegetation. Dr. Jim Tucker wants us using "photosynthesis capacity" to describe NDVI, as it reflects more the ability of the land to absorb wavelength. In previous studies, there is a strong correlation of NDVI with wealth, since green space is a luxury product in most place of America.
+Now we know the area that we are interested in based on the holc_grade graph, we will start finding the NDVI, Normalized Difference Vegetation Index in the near summer. NDVI stands for the "greenness" of the land, with higher value indicates higher reflection in green wavelength, suggesting more vegetation. Dr. Jim Tucker wants us using "photosynthesis capacity" to describe NDVI, as it reflects more the ability of the land to absorb wavelength. In previous studies, there is a strong correlation of NDVI with wealth, since green space is a luxury product in most place of America.
 
 ```{r}
 ## STAC Search over 400 million assets.
@@ -106,7 +106,7 @@ raster_cube(col, cube, mask = S2.mask) |>
   plot(rgb = 1:3)
 ```
 
-We selected the location (San Francisco), the time (summer 2022), the data source (ESA Sentinel-2), and the means to remove the cloud cover. At present, we will carry out the calculation of NDVI. NDVI is calculated as a ratio between the red (R) and near infrared (NIR) values in traditional fashion: (NIR - R) / (NIR + R). We will need a raster format ndvi and an average ndvi per holc_grade.
+As we selected the location (San Francisco), the time (summer 2022), the data source (ESA Sentinel-2), and the means to remove the cloud cover, we will carry out the calculation of NDVI. NDVI is calculated as a ratio between the red (R) and near infrared (NIR) values in traditional fashion: (NIR - R) / (NIR + R). In this case, they are represented by specific band (like B08, B04). We calculate a raster format ndvi and the average ndvi per holc_grade.
 
 ```{r}
 ndvi <- 
@@ -124,7 +124,7 @@ ndvi2
 
 ## Map of current (2019) mean NDVI across city redlining from the 1950s.
 
-At present, we already have the ndvi data, and we want to make sure that the area of the two data is the same before directly displaying the ndvi data within each tier. The following image will stack our NDVI map with holc_grade.
+At present, we already have the ndvi data, and we want to make sure that the area of the two data is the same before directly displaying the ndvi data within each tier. The following map stack our average NDVI data with holc_grade of San Francisco.
 
 ```{r}
 tm_shape(ndvi2) + tm_raster(style = "quantile") + tm_shape(sf) + tm_polygons("holc_grade", alpha = 0.5) + tm_layout(legend.outside=TRUE)
@@ -132,7 +132,7 @@ tm_shape(ndvi2) + tm_raster(style = "quantile") + tm_shape(sf) + tm_polygons("ho
 
 # 3. NDVI
 
-Now that we have average NDVI data, we can plot the NDVI of specific sub districts in San Francisco.
+Now that we have average NDVI data, we joined it with the sf dataset, so that we can plot the NDVI of specific sub districts in San Francisco.From this graph,it's obvious that there are significant differences in NDVI across all grades, and better grades like A and B are associated with higher NDVI.This provides evidence for the environmental inequality caused by historical injustic, making vulnerable communities even more harsh and perilous.
 
 ```{r}
 ave_ndvi |> as_tibble()
@@ -147,7 +147,7 @@ tm_shape(ndvi_poly) + tm_polygons("NDVI", palette = "Greens") +
 
 ## NDVI Average in each Grade of Land:
 
-Now that we know the mean between each block, can we verify it with the overall mean? We can calculate this by taking some simple averages:
+Now that we know the mean between each grade, can we verify it with the overall mean? We can calculate this by taking some simple averages.Here we summarize the mean NDVI across every holc_grade. The NDVI for the 2 worst grades (C and D) are almost the same, while the blocks with the a little better grade (B) has slightly greater NDVI. As Redlining's zoning is dominated by D, it cannot be proved that Redlining has a direct relationship with lower NDVI based on a single case in San Francisco.However, blocks with the best grade (A) has significanrly higher NDVI than all others (almost 150% of grade B).
 
 ```{r}
 ndvi_poly |> as_tibble() |>
@@ -155,11 +155,10 @@ ndvi_poly |> as_tibble() |>
   summarise(mean_NDVI = mean(NDVI))
 ```
 
-These data reflect that region A has significantly higher NDVI values. Since NDVI is normalized as a result, the difference between 0.1 will be very large in reality. The overall gap of BCD is small. As Redlining's zoning is dominated by D, it cannot be proved that Redlining has a direct relationship with lower NDVI based on a single case in San Francisco.
 
 ## Fresno as Comparison
 
-We will use Fresno, an inland city, for comparison to increase scientific significance. Fresno's process will merge directly and present the result as an image and the final mean:
+We will compare Fresno, an inland city, to San Francisco to increase scientific significance. Fresno's process resembles those for SF, and we will merge everything directly, and present the result & final mean as a map.
 
 ```{r}
 fresno <-"https://dsl.richmond.edu/panorama/redlining/static/downloads/shapefiles/CAFresno1936.zip"
@@ -211,10 +210,11 @@ ndvi_poly2 |> as_tibble() |>
   summarise(mean_NDVI = mean(NDVI))
 ```
 
-Fresno is a famous agricultural city, and during the planting period, we can expect a high NDVI (any plant has a high NDVI, and in the city area and density are more important than the type of plant). When the overall Sample value was large, we found that the NDVI value of area D, where Redlining was located, was significantly lower. These two very different cities together suggest that NDVI is partly proof that the social science impact of Redlining still lives on today.
+Fresno is a famous agricultural city, and during the planting period, we can expect a high NDVI (any plant has a high NDVI, and in the city area and density are more important than the type of plant). When the overall Sample value was large, we found that the NDVI value of area D, where Redlining was located, was significantly lower. These two very different cities collectively suggest that NDVI provides evidence of social injustic impact of historical racism practices like Redlining.
 
 # Exercise 3:
 
 **Explain why considering systematic inequity and racism is important in the context of global change and developing solutions to the biodiversity crisis.**
 
-Considering the systematic inequality helps inform a more comprehensive understanding on the historical background of many environmental crisis today. For instance, despite climate change being a global environmental issue, systematic injustices and inequality has resulted in uneven harm against certain groups of people who are usually the least responsible for such crisis, and have minor financial or social influence. When developing solutions of biodiversity crisis, it's important to identify the most vulnerable regions/people that should be prioritized. Moreover, future solution including regeneration and sustainability should aim for redress the issues caused by historical inequality.
+Considering the systematic inequality helps inform a more comprehensive understanding on the historical background of many environmental crisis today. For instance, despite climate change being a global environmental issue, systematic injustices and inequality has resulted in uneven harm against certain groups of people who are usually the least responsible for such crisis, and have minor financial or social influence. When developing solutions of biodiversity crisis, it's important to identify the most vulnerable regions/people that should be prioritized. Moreover, future solution including regeneration and sustainability should aim for redress the issues caused by historical inequality. As professor Schell pointed out, incorporating environmental justice principles into our interpretation of urban ecology and biodiversity is vital, as they laid the foundation of effective conservation and sustainability. This also helps to foster civic responsibility and enhance social resiliency. 
+

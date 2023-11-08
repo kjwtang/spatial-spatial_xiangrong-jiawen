@@ -82,7 +82,7 @@ Now we know the area that we are interested in based on the holc_grade graph, we
 ## STAC Search over 400 million assets.
 box <- st_bbox(sf) 
 start_date <- "2022-06-01"
-end_date <- "2022-08-01"
+end_date <- "2022-09-01"
 items <- 
   stac("https://earth-search.aws.element84.com/v0/") |>
   stac_search(collections = "sentinel-s2-l2a-cogs",

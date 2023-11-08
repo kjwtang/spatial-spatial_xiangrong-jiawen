@@ -14,32 +14,30 @@ Create the Environment before starting:
 
     ## terra 1.7.55
 
-    ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-    ## ✔ dplyr     1.1.3     ✔ readr     2.1.4
-    ## ✔ forcats   1.0.0     ✔ stringr   1.5.0
-    ## ✔ ggplot2   3.4.4     ✔ tibble    3.2.1
-    ## ✔ lubridate 1.9.3     ✔ tidyr     1.3.0
-    ## ✔ purrr     1.0.2     
+    ## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.0 ──
+
+    ## ✔ ggplot2 3.4.4     ✔ purrr   1.0.2
+    ## ✔ tibble  3.2.1     ✔ dplyr   1.1.3
+    ## ✔ tidyr   1.3.0     ✔ stringr 1.5.0
+    ## ✔ readr   2.1.4     ✔ forcats 1.0.0
+
     ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
     ## ✖ tidyr::extract() masks terra::extract()
     ## ✖ dplyr::filter()  masks stats::filter()
     ## ✖ dplyr::lag()     masks stats::lag()
-    ## ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
-    ## Linking to GEOS 3.8.0, GDAL 3.0.4, PROJ 6.3.1; sf_use_s2() is TRUE
-    ## 
+
+    ## Linking to GEOS 3.10.2, GDAL 3.4.1, PROJ 8.2.1; sf_use_s2() is TRUE
+
     ## 
     ## Attaching package: 'gdalcubes'
-    ## 
-    ## 
+
     ## The following objects are masked from 'package:terra':
     ## 
     ##     animate, crop, size
-    ## 
-    ## 
+
     ## 
     ## Attaching package: 'jsonlite'
-    ## 
-    ## 
+
     ## The following object is masked from 'package:purrr':
     ## 
     ##     flatten
@@ -187,7 +185,6 @@ ave_ndvi
     ## # A tibble: 97 × 3
     ##      FID time        NDVI
     ##    <int> <chr>      <dbl>
-<<<<<<< HEAD
     ##  1     1 2022-06-01 0.315
     ##  2     2 2022-06-01 0.407
     ##  3     3 2022-06-01 0.387
@@ -198,18 +195,6 @@ ave_ndvi
     ##  8     8 2022-06-01 0.238
     ##  9     9 2022-06-01 0.310
     ## 10    10 2022-06-01 0.269
-=======
-    ##  1     1 2022-06-01 0.308
-    ##  2     2 2022-06-01 0.411
-    ##  3     3 2022-06-01 0.385
-    ##  4     4 2022-06-01 0.254
-    ##  5     5 2022-06-01 0.298
-    ##  6     6 2022-06-01 0.386
-    ##  7     7 2022-06-01 0.302
-    ##  8     8 2022-06-01 0.239
-    ##  9     9 2022-06-01 0.310
-    ## 10    10 2022-06-01 0.282
->>>>>>> b5293dbc6d70034b3c2626238f35d3653b96cac0
     ## # ℹ 87 more rows
 
 ``` r
@@ -218,13 +203,8 @@ ndvi2
 
     ## stars object with 3 dimensions and 1 attribute
     ## attribute(s):
-<<<<<<< HEAD
     ##             Min.    1st Qu.    Median      Mean  3rd Qu.      Max.
     ## NDVI  -0.7859753 0.02700993 0.1098709 0.1478841 0.286732 0.9319921
-=======
-    ##             Min.    1st Qu.   Median      Mean   3rd Qu.      Max. NA's
-    ## NDVI  -0.8634314 0.02882406 0.114758 0.1527623 0.2857621 0.9341222   44
->>>>>>> b5293dbc6d70034b3c2626238f35d3653b96cac0
     ## dimension(s):
     ##      from   to offset      delta  refsys point                  values x/y
     ## x       1 1000 -122.5  0.0001474  WGS 84    NA                    NULL [x]
@@ -280,7 +260,6 @@ ave_ndvi |> as_tibble()
     ## # A tibble: 97 × 3
     ##      FID time        NDVI
     ##    <int> <chr>      <dbl>
-<<<<<<< HEAD
     ##  1     1 2022-06-01 0.315
     ##  2     2 2022-06-01 0.407
     ##  3     3 2022-06-01 0.387
@@ -291,18 +270,6 @@ ave_ndvi |> as_tibble()
     ##  8     8 2022-06-01 0.238
     ##  9     9 2022-06-01 0.310
     ## 10    10 2022-06-01 0.269
-=======
-    ##  1     1 2022-06-01 0.308
-    ##  2     2 2022-06-01 0.411
-    ##  3     3 2022-06-01 0.385
-    ##  4     4 2022-06-01 0.254
-    ##  5     5 2022-06-01 0.298
-    ##  6     6 2022-06-01 0.386
-    ##  7     7 2022-06-01 0.302
-    ##  8     8 2022-06-01 0.239
-    ##  9     9 2022-06-01 0.310
-    ## 10    10 2022-06-01 0.282
->>>>>>> b5293dbc6d70034b3c2626238f35d3653b96cac0
     ## # ℹ 87 more rows
 
 ``` r
@@ -348,17 +315,10 @@ ndvi_poly |> as_tibble() |>
     ## # A tibble: 4 × 2
     ##   holc_grade mean_NDVI
     ##   <chr>          <dbl>
-<<<<<<< HEAD
     ## 1 A              0.316
     ## 2 B              0.209
     ## 3 C              0.192
     ## 4 D              0.192
-=======
-    ## 1 A              0.315
-    ## 2 B              0.210
-    ## 3 C              0.192
-    ## 4 D              0.191
->>>>>>> b5293dbc6d70034b3c2626238f35d3653b96cac0
 
 ## Fresno as Comparison
 
@@ -427,16 +387,16 @@ fs_ave_ndvi |> as_tibble()
     ## # A tibble: 24 × 3
     ##      FID time        NDVI
     ##    <int> <chr>      <dbl>
-    ##  1     1 2022-06-01 0.399
+    ##  1     1 2022-06-01 0.400
     ##  2     2 2022-06-01 0.391
-    ##  3     3 2022-06-01 0.416
+    ##  3     3 2022-06-01 0.417
     ##  4     4 2022-06-01 0.307
-    ##  5     5 2022-06-01 0.249
+    ##  5     5 2022-06-01 0.250
     ##  6     6 2022-06-01 0.340
-    ##  7     7 2022-06-01 0.257
-    ##  8     8 2022-06-01 0.254
+    ##  7     7 2022-06-01 0.256
+    ##  8     8 2022-06-01 0.255
     ##  9     9 2022-06-01 0.262
-    ## 10    10 2022-06-01 0.245
+    ## 10    10 2022-06-01 0.246
     ## # ℹ 14 more rows
 
 ``` r
@@ -470,9 +430,9 @@ ndvi_poly2 |> as_tibble() |>
     ## # A tibble: 4 × 2
     ##   holc_grade mean_NDVI
     ##   <chr>          <dbl>
-    ## 1 A              0.395
+    ## 1 A              0.396
     ## 2 B              0.314
-    ## 3 C              0.228
+    ## 3 C              0.229
     ## 4 D              0.207
 
 Fresno is a famous agricultural city, and during the planting period, we

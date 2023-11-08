@@ -155,7 +155,6 @@ ndvi_poly |> as_tibble() |>
   summarise(mean_NDVI = mean(NDVI))
 ```
 
-
 ## Fresno as Comparison
 
 We will compare Fresno, an inland city, to San Francisco to increase scientific significance. Fresno's process resembles those for SF, and we will merge everything directly, and present the result & final mean as a map.
@@ -212,9 +211,8 @@ ndvi_poly2 |> as_tibble() |>
 
 Fresno is a famous agricultural city, and during the planting period, we can expect a high NDVI (any plant has a high NDVI, and in the city area and density are more important than the type of plant). When the overall Sample value was large, we found that the NDVI value of area D, where Redlining was located, was significantly lower. These two very different cities collectively suggest that NDVI provides evidence of social injustic impact of historical racism practices like Redlining.
 
-# Exercise 3:
+# **4. Conclusion**
 
-**Explain why considering systematic inequity and racism is important in the context of global change and developing solutions to the biodiversity crisis.**
+#### **Explain why considering systematic inequity and racism is important in the context of global change and developing solutions to the biodiversity crisis.**
 
-Considering the systematic inequality helps inform a more comprehensive understanding on the historical background of many environmental crisis today. For instance, despite climate change being a global environmental issue, systematic injustices and inequality has resulted in uneven harm against certain groups of people who are usually the least responsible for such crisis, and have minor financial or social influence. When developing solutions of biodiversity crisis, it's important to identify the most vulnerable regions/people that should be prioritized. Moreover, future solution including regeneration and sustainability should aim for redress the issues caused by historical inequality. As professor Schell pointed out, incorporating environmental justice principles into our interpretation of urban ecology and biodiversity is vital, as they laid the foundation of effective conservation and sustainability. This also helps to foster civic responsibility and enhance social resiliency. 
-
+Considering the systematic inequality helps inform a more comprehensive understanding on the historical background of many environmental crisis today. For instance, despite climate change being a global environmental issue, systematic injustices and inequality has resulted in uneven harm against certain groups of people who are usually the least responsible for such crisis, and have minor financial or social influence. When developing solutions of biodiversity crisis, it's important to identify the most vulnerable regions/people that should be prioritized. Moreover, future solution including regeneration and sustainability should aim for redress the issues caused by historical inequality. As professor Schell pointed out, incorporating environmental justice principles into our interpretation of urban ecology and biodiversity is vital, as they laid the foundation of effective conservation and sustainability. This also helps to foster civic responsibility and enhance social resiliency.

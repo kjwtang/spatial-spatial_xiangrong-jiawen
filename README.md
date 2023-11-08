@@ -4,27 +4,17 @@
 ## Team Members:
 
 - Jiawen Tang, kjwtang
-- full name, github handle
+- Xiangrong (Mark) Sun, MarkSun2001
 
-## assignment
+## Summary
+In this report, we show the environmental injustice resulted from historical racism, in particular the Redlining in US cities, that are indicated today. We got inspiration from an article by Christopher Schell and collegue ['The ecological and evolutionary consequences of systemic racism in urban environments'], which shows the profound, latent ecological impacts of systematic racism and classism. We used data to recreate some maps to evaluate the main conclusions highlighted in this article. In specific, we show how NDVI differ across blocks of each "suitability rank"，with the best-rated city blocks having significantly higher NDVI, showing environmental superiority. What we found corresponds to the conclusions of Schell's article.
 
-All work for this assignment should be in the `assignment` directory.  You will work in the `.Rmd` notebook, and commit your rendered output files (`.md` and associated files) in the `assignment` directory as well.
+## File
 
-## Special files
-
-All team repositories will also include most of the special files found here:
-
-### Common files
-
-- `README.md` this file, a general overview of the repository in markdown format.  
-- `.gitignore` Optional file, ignore common file types we don't want to accidentally commit to GitHub. Most projects should use this. 
-- `<REPO-NAME>.Rproj` Optional, an R-Project file created by RStudio for it's own configuration.  Some people prefer to `.gitignore` this file.
+Our report is in the `.Rmd` notebook in the `assignment` directory. We commit our rendered output files (`.md` and associated files) in the `assignment` directory as well.
 
 
-### Infrastructure for Testing
 
-- `DESCRIPTION` a metadata file for the repository, based on the R package standard. It's main purpose here is as a place to list any additional R packages/libraries needed for any of the .Rmd files to run.
-- `.github/workflows/main.yml` defines the Continuous Integration testing script for running the .Rmd files to confirm reproducibility.
 
 
 
